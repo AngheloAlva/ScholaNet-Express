@@ -1,4 +1,4 @@
-import { Schema, Model } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
 const taskSchema = new Schema({
   title: String,
@@ -19,4 +19,4 @@ const taskSchema = new Schema({
   }]
 })
 
-export const TaskModel = new Model('Task', taskSchema)
+export const TaskModel = mongoose.model('Task', taskSchema)

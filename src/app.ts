@@ -9,8 +9,8 @@ void (async () => {
 
 async function main (): Promise<void> {
   await MongoDatabase.connect({
-    dbName: '',
-    mongoUrl: ''
+    dbName: envs.MONGO_DB_NAME,
+    mongoUrl: envs.MONGO_URL
   })
 
   const server = new Server({

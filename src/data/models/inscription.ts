@@ -1,4 +1,4 @@
-import { Schema, Model } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
 const inscriptionSchema = new Schema({
   student: {
@@ -16,4 +16,4 @@ const inscriptionSchema = new Schema({
   enrollmentDate: Date
 })
 
-export const InscriptionModel = new Model('Inscription', inscriptionSchema)
+export const InscriptionModel = mongoose.model('Inscription', inscriptionSchema)
