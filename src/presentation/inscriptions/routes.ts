@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-extraneous-class */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import { Router } from 'express'
+import { body } from 'express-validator'
 import { InscriptionController } from './controller'
+import { validate } from '../../middlewares/validation.middleware'
 import { InscriptionService } from '../services/inscriptions.service'
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class InscriptionRoutes {
   static get routes (): Router {
     const router = Router()
@@ -10,7 +14,14 @@ export class InscriptionRoutes {
     const controller = new InscriptionController(inscriptionService)
 
     router.get('/inscriptions', controller.getInscriptions)
-    router.post('/inscriptions', controller.createInscription)
+
+    router.post('/inscriptions', [
+      body('studentId').isMongoId(),
+      body('programId').isMongoId(),
+      body('status').isString(),
+      body('enrollmentDate').isDate(),
+      validate
+    ], controller.createInscription)
 
     return router
   }

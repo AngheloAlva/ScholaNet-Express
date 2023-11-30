@@ -3,14 +3,23 @@
 import { InscriptionModel } from '../../data/models/inscription'
 import { CustomError } from '../../domain/errors/custom.error'
 
-import type { CreateInscriptionDto } from '../../domain/dtos/inscription/create-inscription.dto'
-import type { PaginationDto } from '../../domain/shared/pagination.dto'
+interface CreateInscriptionProps {
+  student: string
+  program: string
+  status: string
+  enrollmentDate: Date
+}
+
+interface PaginationProps {
+  page: number
+  limit: number
+}
 
 export class InscriptionService {
-  async createInscription (createInscription: CreateInscriptionDto): Promise<any> {
+  async createInscription (createInscription: CreateInscriptionProps): Promise<any> {
     const productExists = await InscriptionModel.findOne({
-      student: createInscription.student,
-      program: createInscription.program
+      studentId: createInscription.student,
+      programId: createInscription.program
     })
 
     if (productExists) throw CustomError.badRequest('Inscription already exists')
@@ -24,9 +33,7 @@ export class InscriptionService {
     }
   }
 
-  async getInscriptions (paginationDto: PaginationDto): Promise<any> {
-    const { page, limit } = paginationDto
-
+  async getInscriptions ({ page, limit }: PaginationProps): Promise<any> {
     try {
       const [total, inscriptions] = await Promise.all([
         InscriptionModel.countDocuments(),
