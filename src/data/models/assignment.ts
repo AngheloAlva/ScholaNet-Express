@@ -1,9 +1,13 @@
 import mongoose, { Schema } from 'mongoose'
 
-const taskSchema = new Schema({
+const assignmentSchema = new Schema({
   title: String,
   description: String,
   dueDate: Date,
+  type: {
+    type: String,
+    enum: ['task', 'evaluation']
+  },
   course: {
     type: Schema.Types.ObjectId,
     ref: 'Course'
@@ -14,9 +18,12 @@ const taskSchema = new Schema({
       ref: 'Student'
     },
     fileUrl: String,
-    score: Number,
     feedback: String
-  }]
+  }],
+  score: {
+    type: Number,
+    required: false
+  }
 })
 
-export const TaskModel = mongoose.model('Task', taskSchema)
+export const AssignmentModel = mongoose.model('Assignment', assignmentSchema)

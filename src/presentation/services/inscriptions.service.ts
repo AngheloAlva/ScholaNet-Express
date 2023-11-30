@@ -2,6 +2,7 @@
 
 import { InscriptionModel } from '../../data/models/inscription'
 import { CustomError } from '../../domain/errors/custom.error'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
 
 interface CreateInscriptionProps {
   student: string
@@ -10,13 +11,8 @@ interface CreateInscriptionProps {
   enrollmentDate: Date
 }
 
-interface PaginationProps {
-  page: number
-  limit: number
-}
-
 export class InscriptionService {
-  async createInscription (createInscription: CreateInscriptionProps): Promise<any> {
+  async createInscription (createInscription: CreateInscriptionProps): Promise<unknown> {
     const productExists = await InscriptionModel.findOne({
       studentId: createInscription.student,
       programId: createInscription.program
@@ -33,7 +29,7 @@ export class InscriptionService {
     }
   }
 
-  async getInscriptions ({ page, limit }: PaginationProps): Promise<any> {
+  async getInscriptions ({ page, limit }: PaginationDto): Promise<any> {
     try {
       const [total, inscriptions] = await Promise.all([
         InscriptionModel.countDocuments(),
