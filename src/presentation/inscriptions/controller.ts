@@ -21,8 +21,16 @@ export class InscriptionController {
 
   createInscription = async (req: Request, res: Response): Promise<void> => {
     try {
-      const inscriptionData = req.body
-      const newInscription = await this.inscriptionService.createInscription(inscriptionData)
+      const { name, lastName, dateOfBirth, password, rut, program, guardian } = req.body
+      const newInscription = await this.inscriptionService.createInscription({
+        name,
+        lastName,
+        dateOfBirth,
+        password,
+        rut,
+        program,
+        guardian
+      })
       res.status(201).json(newInscription)
     } catch (error) {
       this.handleError(error, res)

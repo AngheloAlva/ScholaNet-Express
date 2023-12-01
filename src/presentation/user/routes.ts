@@ -24,7 +24,7 @@ export class UserRoutes {
       body('lastName').isString().notEmpty().withMessage('Last name is required'),
       body('rut').isString().notEmpty().withMessage('Rut is required'),
       body('email').isEmail().withMessage('Email is required'),
-      body('role').isString().notEmpty().isIn(['user', 'teacher', 'admin']).withMessage('Role is required, must be one of [user, teacher, admin]'),
+      body('role').isString().notEmpty().isIn(['guardian', 'teacher', 'admin']).withMessage('Role is required, must be one of [user, teacher, admin]'),
       validate
     ], controller.createUser)
 

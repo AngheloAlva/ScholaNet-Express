@@ -13,7 +13,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'teacher', 'admin']
+    enum: ['guardian', 'teacher', 'admin']
   },
   students: [{
     type: Schema.Types.ObjectId,

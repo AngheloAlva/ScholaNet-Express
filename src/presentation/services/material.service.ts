@@ -1,3 +1,4 @@
+import { CourseModel } from '../../data/models/course'
 import { MaterialModel } from '../../data/models/material'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
@@ -15,6 +16,9 @@ export class MaterialService {
     title, description, type, url, course
   }: CreateMaterial): Promise<void> {
     try {
+      const courseExist = await CourseModel.findById(course)
+      if (courseExist == null) throw CustomError.badRequest('Course does not exist')
+
       const material = new MaterialModel({
         title,
         description,

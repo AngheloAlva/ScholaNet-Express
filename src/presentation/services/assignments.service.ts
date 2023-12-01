@@ -1,4 +1,5 @@
 import { AssignmentModel } from '../../data/models/assignment'
+import { CourseModel } from '../../data/models/course'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
 
@@ -16,6 +17,9 @@ export class AssignmentService {
     title, description, dueDate, course, type, score
   }: CreateAssignment): Promise<any> {
     try {
+      const courseExist = await CourseModel.findById(course)
+      if (courseExist == null) throw CustomError.badRequest('Course does not exist')
+
       const assignment = new AssignmentModel({
         title,
         description,

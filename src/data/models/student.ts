@@ -5,13 +5,18 @@ const studentSchema = new Schema({
   lastName: String,
   dateOfBirth: Date,
   password: String,
+  guardian: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
   rut: {
     type: String,
     unique: true
   },
   program: {
     type: String,
-    enum: ['primary', 'secondary', 'special', 'workshop']
+    enum: ['primary', 'secondary', 'special', 'workshop'],
+    required: true
   }
 })
 

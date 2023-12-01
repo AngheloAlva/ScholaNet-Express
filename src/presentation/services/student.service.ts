@@ -1,4 +1,6 @@
+import { ProgramModel } from '../../data/models/program'
 import { StudentModel } from '../../data/models/student'
+import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
 
@@ -9,21 +11,27 @@ interface CreateStudent {
   password: string
   rut: string
   program: string
+  guardian: string
 }
 
 export class StudentService {
   async createStudent ({
-    name, lastName, dateOfBirth, password, rut, program
+    name, lastName, dateOfBirth, password, rut, program, guardian
   }: CreateStudent): Promise<void> {
-    const userExist = await StudentModel.findOne({ rut })
+    const studentDB = await StudentModel.findOne({ rut })
+    if (studentDB == null) throw CustomError.badRequest('Student does not exist')
 
-    if (userExist != null) {
-      throw CustomError.badRequest('Student already exists')
-    }
+    const guardianExist = await UserModel.findById(guardian).where({ role: 'guardian' })
+    if (guardianExist == null) throw CustomError.badRequest('Guardian does not exist')
+
+    const programExist = await ProgramModel.findById(program)
+    if (programExist == null) throw CustomError.badRequest('Program does not exist')
 
     try {
-      const user = new StudentModel({ name, lastName, dateOfBirth, password, rut, program })
-      await user.save()
+      const student = new StudentModel({ name, lastName, dateOfBirth, password, rut, program })
+      await student.save()
+
+      return student.id
     } catch (error) {
       throw CustomError.internalServerError(`Error creating user: ${error as string}`)
     }

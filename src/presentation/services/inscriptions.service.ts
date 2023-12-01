@@ -1,27 +1,41 @@
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
 import { InscriptionModel } from '../../data/models/inscription'
 import { CustomError } from '../../domain/errors/custom.error'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import { StudentService } from './student.service'
 
 interface CreateInscriptionProps {
-  student: string
+  name: string
+  lastName: string
+  dateOfBirth: Date
+  password: string
+  rut: string
   program: string
-  status: string
-  enrollmentDate: Date
+  guardian: string
 }
 
 export class InscriptionService {
-  async createInscription (createInscription: CreateInscriptionProps): Promise<unknown> {
-    const productExists = await InscriptionModel.findOne({
-      studentId: createInscription.student,
-      programId: createInscription.program
+  async createInscription ({
+    name, lastName, dateOfBirth, password, rut, program, guardian
+  }: CreateInscriptionProps): Promise<unknown> {
+    const studentService = new StudentService()
+    const studentId = await studentService.createStudent({
+      name,
+      lastName,
+      dateOfBirth,
+      password,
+      rut,
+      program,
+      guardian
     })
 
-    if (productExists) throw CustomError.badRequest('Inscription already exists')
-
     try {
-      const inscription = new InscriptionModel(createInscription)
+      const inscription = new InscriptionModel({
+        student: studentId,
+        program
+      })
       await inscription.save()
       return inscription
     } catch (error) {

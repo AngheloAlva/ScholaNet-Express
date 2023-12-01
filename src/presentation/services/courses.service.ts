@@ -1,4 +1,6 @@
 import { CourseModel } from '../../data/models/course'
+import { ProgramModel } from '../../data/models/program'
+import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
 
@@ -14,10 +16,13 @@ export class CourseService {
     title, description, program, teacher
   }: CreateCourse): Promise<any> {
     const courseExist = await CourseModel.findOne({ title })
+    if (courseExist != null) throw CustomError.badRequest('Course already exists')
 
-    if (courseExist != null) {
-      throw CustomError.badRequest('Course already exists')
-    }
+    const teacherExist = await UserModel.findById(teacher).where({ role: 'teacher' })
+    if (teacherExist == null) throw CustomError.badRequest('Teacher does not exist')
+
+    const programExist = await ProgramModel.findById(program)
+    if (programExist == null) throw CustomError.badRequest('Program does not exist')
 
     try {
       const course = new CourseModel({ title, description, program, teacher })

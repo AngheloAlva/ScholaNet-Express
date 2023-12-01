@@ -18,23 +18,6 @@ export class StudentController {
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  createStudent = async (req: any, res: Response): Promise<void> => {
-    try {
-      const { name, lastName, dateOfBirth, password, rut, program } = req.body
-      const newStudent = await this.studentService.createStudent({
-        name,
-        lastName,
-        dateOfBirth,
-        password,
-        rut,
-        program
-      })
-      res.status(201).json(newStudent)
-    } catch (error) {
-      this.handleError(error, res)
-    }
-  }
-
   getStudents = async (req: any, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
