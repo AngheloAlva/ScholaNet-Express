@@ -14,17 +14,17 @@ export class MaterialRoutes {
     const controller = new MaterialController(service)
 
     router.get('/materials', controller.getMaterials)
-    router.get('/materials/:id', [
-      param('id').isString(),
+    router.get('/material/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
       validate
     ], controller.getMaterialById)
 
-    router.post('/materials', [
-      body('title').isString(),
-      body('description').isString(),
-      body('type').isString(),
-      body('url').isString(),
-      body('course').isString(),
+    router.post('/material', [
+      body('title').isString().notEmpty().withMessage('Title is required'),
+      body('description').isString().notEmpty().withMessage('Description is required'),
+      body('type').isString().isIn(['pdf', 'link', 'file']).withMessage('Type is required, must be one of [pdf, link, file]'),
+      body('url').isURL().notEmpty().withMessage('Url is required'),
+      body('course').isMongoId().notEmpty().withMessage('Course is required'),
       validate
     ], controller.createMaterial)
 

@@ -8,22 +8,23 @@ interface CreateUser {
   rut: string
   email: string
   role: string
-  students: string[]
 }
 
 export class UserService {
   async createUser ({
-    name, lastName, rut, email, role, students
-  }: CreateUser): Promise<void> {
+    name, lastName, rut, email, role
+  }: CreateUser): Promise<any> {
     const userExist = await UserModel.findOne({ rut })
 
     if (userExist != null) {
-      throw new Error('User already exists')
+      throw CustomError.badRequest('User already exists')
     }
 
     try {
-      const user = new UserModel({ name, lastName, rut, email, role, students })
+      const user = new UserModel({ name, lastName, rut, email, role })
       await user.save()
+
+      return user
     } catch (error) {
       throw CustomError.internalServerError(`Error creating user: ${error as string}`)
     }
@@ -34,7 +35,7 @@ export class UserService {
       const [total, users] = await Promise.all([
         UserModel.countDocuments(),
         UserModel.find()
-          .skip(page - 1 * limit)
+          .skip((page - 1) * limit)
           .limit(limit)
       ])
       return {
@@ -49,7 +50,7 @@ export class UserService {
   async getUserById (id: string): Promise<any> {
     try {
       const user = await UserModel.findById(id)
-      if (user == null) throw new Error('User not found')
+      if (user == null) throw CustomError.notFound('User not found')
 
       return user
     } catch (error) {

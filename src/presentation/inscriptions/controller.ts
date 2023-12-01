@@ -19,26 +19,26 @@ export class InscriptionController {
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  createInscription = async (req: Request, res: Response): Promise<Response> => {
+  createInscription = async (req: Request, res: Response): Promise<void> => {
     try {
       const inscriptionData = req.body
       const newInscription = await this.inscriptionService.createInscription(inscriptionData)
-      return res.status(201).json(newInscription)
+      res.status(201).json(newInscription)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 
-  getInscriptions = async (req: Request, res: Response): Promise<Request | any> => {
+  getInscriptions = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
       const inscriptions = await this.inscriptionService.getInscriptions({
         page: Number(page),
         limit: Number(limit)
       })
-      return res.status(200).json(inscriptions)
+      res.status(200).json(inscriptions)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 }

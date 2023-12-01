@@ -16,10 +16,10 @@ export class InscriptionRoutes {
     router.get('/inscriptions', controller.getInscriptions)
 
     router.post('/inscriptions', [
-      body('studentId').isMongoId(),
-      body('programId').isMongoId(),
-      body('status').isString(),
-      body('enrollmentDate').isDate(),
+      body('studentId').isMongoId().notEmpty().withMessage('Student id is required'),
+      body('programId').isMongoId().notEmpty().withMessage('Program id is required'),
+      body('status').isString().notEmpty().isIn(['enrolled', 'completed', 'cancelled']).withMessage('Status is required, must be one of [enrolled, completed, cancelled]'),
+      body('enrollmentDate').isDate().notEmpty().withMessage('Enrollment date is required'),
       validate
     ], controller.createInscription)
 

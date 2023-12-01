@@ -33,7 +33,7 @@ export class MaterialService {
       const [total, materials] = await Promise.all([
         MaterialModel.countDocuments(),
         MaterialModel.find()
-          .skip(page - 1 * limit)
+          .skip((page - 1) * limit)
           .limit(limit)
           .populate('course')
       ])
@@ -49,7 +49,7 @@ export class MaterialService {
   async getMaterialById (id: string): Promise<any> {
     try {
       const material = await MaterialModel.findById(id)
-      if (material == null) throw new Error('Material not found')
+      if (material == null) throw CustomError.notFound('Material not found')
 
       return material
     } catch (error) {

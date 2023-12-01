@@ -14,18 +14,18 @@ export class StudentRoutes {
     const controller = new StudentController(service)
 
     router.get('/students', controller.getStudents)
-    router.get('/students/:id', [
-      param('id').isString(),
+    router.get('/student/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
       validate
     ], controller.getStudentById)
 
     router.post('/student', [
-      body('name').isString(),
-      body('lastName').isString(),
-      body('dateOfBirth').isDate(),
-      body('rut').isString(),
-      body('password').isString(),
-      body('program').isString(),
+      body('name').isString().notEmpty().withMessage('Name is required'),
+      body('lastName').isString().notEmpty().withMessage('Last name is required'),
+      body('dateOfBirth').isDate().notEmpty().withMessage('Date of birth is required'),
+      body('rut').isString().notEmpty().withMessage('Rut is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      body('program').isMongoId().notEmpty().withMessage('Program is required'),
       validate
     ], controller.createStudent)
 

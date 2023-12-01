@@ -4,7 +4,7 @@
 import { Router } from 'express'
 import { CourseService } from '../services/courses.service'
 import { CourseController } from './controller'
-import { body } from 'express-validator'
+import { body, param } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
 
 export class CourseRoutes {
@@ -14,12 +14,16 @@ export class CourseRoutes {
     const controller = new CourseController(courseService)
 
     router.get('/courses', controller.getCourses)
+    router.get('/course/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      validate
+    ], controller.getCourseById)
 
-    router.post('/courses', [
-      body('title').isString(),
-      body('description').isString(),
-      body('level').isString(),
-      body('teacher').isString(),
+    router.post('/course', [
+      body('title').isString().notEmpty().withMessage('Title is required'),
+      body('description').isString().notEmpty().withMessage('Description is required'),
+      body('program').isMongoId().notEmpty().withMessage('Program is required'),
+      body('teacher').isMongoId().notEmpty().withMessage('Teacher is required'),
       validate
     ], controller.createCourse)
 

@@ -5,20 +5,21 @@ import { type PaginationDto } from '../../domain/shared/pagination.dto'
 interface CreateProgram {
   name: string
   description: string
-  courses: string[]
 }
 
 export class ProgramService {
-  async createProgram ({ name, description, courses }: CreateProgram): Promise<void> {
+  async createProgram ({ name, description }: CreateProgram): Promise<any> {
     const programExist = await ProgramModel.findOne({ name })
 
     if (programExist != null) {
-      throw new Error('Program already exists')
+      throw CustomError.badRequest('Program already exists')
     }
 
     try {
-      const program = new ProgramModel({ name, description, courses })
+      const program = new ProgramModel({ name, description })
       await program.save()
+
+      return program
     } catch (error) {
       throw CustomError.internalServerError(`Error creating program: ${error as string}`)
     }
@@ -29,7 +30,7 @@ export class ProgramService {
       const [total, programs] = await Promise.all([
         ProgramModel.countDocuments(),
         ProgramModel.find()
-          .skip(page - 1 * limit)
+          .skip((page - 1) * limit)
           .limit(limit)
           .populate('courses')
       ])
@@ -45,7 +46,7 @@ export class ProgramService {
   async getProgramById (id: string): Promise<any> {
     try {
       const program = await ProgramModel.findById(id).populate('courses')
-      if (program == null) throw new Error('Program not found')
+      if (program == null) throw CustomError.notFound('Program not found')
 
       return program
     } catch (error) {

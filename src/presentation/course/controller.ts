@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
-import { type Response } from 'express'
+import { type Request, type Response } from 'express'
 import { type CourseService } from '../services/courses.service'
 import { CustomError } from '../../domain/errors/custom.error'
 
@@ -11,38 +11,48 @@ export class CourseController {
 
   private readonly handleError = (error: unknown, res: Response): Response => {
     if (error instanceof CustomError) {
-      res.status(400).json({ message: error.message })
+      return res.status(400).json({ message: error.message })
     }
 
     console.log(error as string)
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  createCourse = async (req: any, res: Response): Promise<Response> => {
+  createCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, level, teacher } = req.body
+      const { title, description, program, teacher } = req.body
       const newCourse = await this.courseService.createCourse({
         title,
         description,
-        level,
+        program,
         teacher
       })
-      return res.status(201).json(newCourse)
+      res.status(201).json(newCourse)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 
-  getCourses = async (req: any, res: Response): Promise<Response> => {
+  getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
       const courses = await this.courseService.getCourses({
         page: Number(page),
         limit: Number(limit)
       })
-      return res.status(200).json(courses)
+      res.status(200).json(courses)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
+    }
+  }
+
+  getCourseById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const course = await this.courseService.getCourseById(id)
+      res.status(200).json(course)
+    } catch (error) {
+      this.handleError(error, res)
     }
   }
 }

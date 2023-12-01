@@ -4,7 +4,8 @@
 import { Router } from 'express'
 import { ProgramService } from '../services/program.service'
 import { ProgramController } from './controller'
-import { param } from 'express-validator'
+import { body, param } from 'express-validator'
+import { validate } from '../../middlewares/validation.middleware'
 
 export class ProgramRoutes {
   static get routes (): Router {
@@ -13,14 +14,15 @@ export class ProgramRoutes {
     const controller = new ProgramController(service)
 
     router.get('/programs', controller.getPrograms)
-    router.get('/programs/:id', [
-      param('id').isString()
+    router.get('/program/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      validate
     ], controller.getProgramById)
 
-    router.post('/programs', [
-      param('name').isString(),
-      param('description').isString(),
-      param('courses').isArray()
+    router.post('/program', [
+      body('name').isString().notEmpty().withMessage('Name is required'),
+      body('description').isString().notEmpty().withMessage('Description is required'),
+      validate
     ], controller.createProgram)
 
     return router

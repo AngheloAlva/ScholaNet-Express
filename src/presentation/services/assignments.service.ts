@@ -14,7 +14,7 @@ interface CreateAssignment {
 export class AssignmentService {
   async createAssignment ({
     title, description, dueDate, course, type, score
-  }: CreateAssignment): Promise<void> {
+  }: CreateAssignment): Promise<any> {
     try {
       const assignment = new AssignmentModel({
         title,
@@ -25,6 +25,8 @@ export class AssignmentService {
         type
       })
       await assignment.save()
+
+      return assignment
     } catch (error) {
       throw CustomError.internalServerError(`Error creating assignments: ${error as string}`)
     }
@@ -35,7 +37,7 @@ export class AssignmentService {
       const [total, assignments] = await Promise.all([
         AssignmentModel.countDocuments(),
         AssignmentModel.find()
-          .skip(page - 1 * limit)
+          .skip((page - 1) * limit)
           .limit(limit)
           .populate('course')
       ])

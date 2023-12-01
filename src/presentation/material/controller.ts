@@ -11,14 +11,14 @@ export class MaterialController {
 
   private readonly handleError = (error: unknown, res: Response): Response => {
     if (error instanceof CustomError) {
-      res.status(400).json({ message: error.message })
+      return res.status(400).json({ message: error.message })
     }
 
     console.log(error as string)
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  createMaterial = async (req: Request, res: Response): Promise<Response> => {
+  createMaterial = async (req: Request, res: Response): Promise<void> => {
     try {
       const { title, description, type, url, course } = req.body
       const newMaterial = await this.materialService.createMaterial({
@@ -28,32 +28,32 @@ export class MaterialController {
         url,
         course
       })
-      return res.status(201).json(newMaterial)
+      res.status(201).json(newMaterial)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 
-  getMaterials = async (req: Request, res: Response): Promise<Response> => {
+  getMaterials = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
       const materials = await this.materialService.getMaterials({
         page: Number(page),
         limit: Number(limit)
       })
-      return res.status(200).json(materials)
+      res.status(200).json(materials)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 
-  getMaterialById = async (req: Request, res: Response): Promise<Response> => {
+  getMaterialById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
       const material = await this.materialService.getMaterialById(id)
-      return res.status(200).json(material)
+      res.status(200).json(material)
     } catch (error) {
-      return this.handleError(error, res)
+      this.handleError(error, res)
     }
   }
 }

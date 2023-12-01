@@ -14,18 +14,17 @@ export class UserRoutes {
     const controller = new UserController(service)
 
     router.get('/users', controller.getUsers)
-    router.get('/users/:id', [
-      param('id').isString(),
+    router.get('/user/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
       validate
     ], controller.getUserById)
 
     router.post('/user', [
-      body('name').isString(),
-      body('lastName').isString(),
-      body('rut').isString(),
-      body('email').isEmail(),
-      body('role').isString(),
-      body('students').isArray(),
+      body('name').isString().notEmpty().withMessage('Name is required'),
+      body('lastName').isString().notEmpty().withMessage('Last name is required'),
+      body('rut').isString().notEmpty().withMessage('Rut is required'),
+      body('email').isEmail().withMessage('Email is required'),
+      body('role').isString().notEmpty().isIn(['user', 'teacher', 'admin']).withMessage('Role is required, must be one of [user, teacher, admin]'),
       validate
     ], controller.createUser)
 

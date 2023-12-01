@@ -13,18 +13,18 @@ export class AssignmentRoutes {
     const service = new AssignmentService()
     const controller = new AssignmentController(service)
 
-    router.get('/assignment', controller.getAssignments)
+    router.get('/assignments', controller.getAssignments)
     router.get('/assignment/:id', [
-      param('id').isString(),
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
       validate
     ], controller.getAssignmentsById)
 
     router.post('/assignment', [
-      body('title').isString(),
-      body('type').isIn(['task', 'evaluation']),
-      body('description').isString(),
-      body('dueDate').isString(),
-      body('course').isString(),
+      body('title').isString().notEmpty().withMessage('Title is required'),
+      body('type').isIn(['task', 'evaluation']).notEmpty().withMessage('Type is required, must be one of [task, evaluation]'),
+      body('description').isString().notEmpty().withMessage('Description is required'),
+      body('dueDate').isString().notEmpty().withMessage('Due date is required'),
+      body('course').isMongoId().notEmpty().withMessage('Course is required'),
       validate
     ], controller.createAssignments)
 

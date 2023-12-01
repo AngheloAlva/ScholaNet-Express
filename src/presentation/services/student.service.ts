@@ -18,7 +18,7 @@ export class StudentService {
     const userExist = await StudentModel.findOne({ rut })
 
     if (userExist != null) {
-      throw new Error('User already exists')
+      throw CustomError.badRequest('Student already exists')
     }
 
     try {
@@ -34,7 +34,7 @@ export class StudentService {
       const [total, students] = await Promise.all([
         StudentModel.countDocuments(),
         StudentModel.find()
-          .skip(page - 1 * limit)
+          .skip((page - 1) * limit)
           .limit(limit)
       ])
       return {
@@ -49,7 +49,7 @@ export class StudentService {
   async getStudentById (id: string): Promise<any> {
     try {
       const student = await StudentModel.findById(id)
-      if (student == null) throw new Error('Student not found')
+      if (student == null) throw CustomError.notFound('Student not found')
 
       return student
     } catch (error) {

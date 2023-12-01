@@ -12,13 +12,13 @@ export class AppRoutes {
   static get routes (): Router {
     const router = Router()
 
-    router.use('/api', InscriptionRoutes.routes)
+    router.use('/api', UserRoutes.routes)
+    router.use('/api', ProgramRoutes.routes)
     router.use('/api', CourseRoutes.routes)
     router.use('/api', AssignmentRoutes.routes)
     router.use('/api', MaterialRoutes.routes)
-    router.use('/api', ProgramRoutes.routes)
     router.use('/api', StudentRoutes.routes)
-    router.use('/api', UserRoutes.routes)
+    router.use('/api', InscriptionRoutes.routes)
 
     return router
   }
