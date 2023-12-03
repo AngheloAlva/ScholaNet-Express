@@ -14,9 +14,8 @@ const studentSchema = new Schema({
     unique: true
   },
   program: {
-    type: String,
-    enum: ['primary', 'secondary', 'special', 'workshop'],
-    required: true
+    type: Schema.Types.ObjectId,
+    ref: 'Program'
   }
 })
 

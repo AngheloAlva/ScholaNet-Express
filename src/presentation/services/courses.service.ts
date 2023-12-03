@@ -9,11 +9,13 @@ interface CreateCourse {
   description: string
   program: string
   teacher: string
+  image: string
+  href: string
 }
 
 export class CourseService {
   async createCourse ({
-    title, description, program, teacher
+    title, description, program, teacher, image, href
   }: CreateCourse): Promise<any> {
     const courseExist = await CourseModel.findOne({ title })
     if (courseExist != null) throw CustomError.badRequest('Course already exists')
@@ -25,8 +27,12 @@ export class CourseService {
     if (programExist == null) throw CustomError.badRequest('Program does not exist')
 
     try {
-      const course = new CourseModel({ title, description, program, teacher })
+      const course = new CourseModel({ title, description, program, teacher, image, href })
       await course.save()
+
+      await ProgramModel.findByIdAndUpdate(program, {
+        $push: { courses: course.id }
+      })
 
       return course
     } catch (error) {

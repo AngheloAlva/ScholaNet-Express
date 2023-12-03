@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
+import { CourseModel } from '../../data/models/course'
 import { InscriptionModel } from '../../data/models/inscription'
 import { CustomError } from '../../domain/errors/custom.error'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -37,6 +38,12 @@ export class InscriptionService {
         program
       })
       await inscription.save()
+
+      await CourseModel.updateMany(
+        { program },
+        { $push: { students: studentId } }
+      )
+
       return inscription
     } catch (error) {
       throw CustomError.internalServerError(`Error creating inscription: ${error as string}`)

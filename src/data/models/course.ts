@@ -14,7 +14,9 @@ const courseSchema = new Schema({
   teacher: {
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  image: String,
+  href: String
 })
 
 export const CourseModel = mongoose.model('Course', courseSchema)

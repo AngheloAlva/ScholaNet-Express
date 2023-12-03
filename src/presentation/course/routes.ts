@@ -24,6 +24,8 @@ export class CourseRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('program').isMongoId().notEmpty().withMessage('Program is required'),
       body('teacher').isMongoId().notEmpty().withMessage('Teacher is required'),
+      body('image').isString().notEmpty().withMessage('Image is required'),
+      body('href').isString().notEmpty().withMessage('Href is required'),
       validate
     ], controller.createCourse)
 

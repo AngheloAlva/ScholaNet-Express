@@ -15,10 +15,10 @@ export class InscriptionRoutes {
 
     router.get('/inscriptions', controller.getInscriptions)
 
-    router.post('/inscriptions', [
+    router.post('/inscription', [
       body('name').isString().notEmpty().withMessage('Name is required'),
       body('lastName').isString().notEmpty().withMessage('Last name is required'),
-      body('dateOfBirth').isDate().notEmpty().withMessage('Date of birth is required'),
+      body('dateOfBirth').isString().notEmpty().withMessage('Date of birth is required'),
       body('rut').isString().notEmpty().withMessage('Rut is required'),
       body('guardian').isMongoId().notEmpty().withMessage('Guardian is required'),
       body('password').isString().notEmpty().withMessage('Password is required'),

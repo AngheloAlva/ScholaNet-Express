@@ -25,6 +25,7 @@ export class AssignmentRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
       body('course').isMongoId().notEmpty().withMessage('Course is required'),
+      body('score').isNumeric().withMessage('Score must be a number').default(0),
       validate
     ], controller.createAssignments)
 

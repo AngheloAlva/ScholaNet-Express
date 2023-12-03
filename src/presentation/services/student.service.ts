@@ -4,6 +4,8 @@ import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
 
+import bcrypt from 'bcrypt'
+
 interface CreateStudent {
   name: string
   lastName: string
@@ -19,7 +21,7 @@ export class StudentService {
     name, lastName, dateOfBirth, password, rut, program, guardian
   }: CreateStudent): Promise<void> {
     const studentDB = await StudentModel.findOne({ rut })
-    if (studentDB == null) throw CustomError.badRequest('Student does not exist')
+    if (studentDB != null) throw CustomError.badRequest('Student already exists')
 
     const guardianExist = await UserModel.findById(guardian).where({ role: 'guardian' })
     if (guardianExist == null) throw CustomError.badRequest('Guardian does not exist')
@@ -28,6 +30,9 @@ export class StudentService {
     if (programExist == null) throw CustomError.badRequest('Program does not exist')
 
     try {
+      const salt = await bcrypt.genSalt(10)
+      password = await bcrypt.hash(password, salt)
+
       const student = new StudentModel({ name, lastName, dateOfBirth, password, rut, program })
       await student.save()
 

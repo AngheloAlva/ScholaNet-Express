@@ -14,7 +14,7 @@ interface CreateMaterial {
 export class MaterialService {
   async createMaterial ({
     title, description, type, url, course
-  }: CreateMaterial): Promise<void> {
+  }: CreateMaterial): Promise<any> {
     try {
       const courseExist = await CourseModel.findById(course)
       if (courseExist == null) throw CustomError.badRequest('Course does not exist')
@@ -27,6 +27,8 @@ export class MaterialService {
         course
       })
       await material.save()
+
+      return material
     } catch (error) {
       throw CustomError.internalServerError(`Error creating material: ${error as string}`)
     }

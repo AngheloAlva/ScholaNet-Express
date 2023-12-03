@@ -22,7 +22,8 @@ const assignmentSchema = new Schema({
   }],
   score: {
     type: Number,
-    required: false
+    required: false,
+    default: 0
   }
 })
 
