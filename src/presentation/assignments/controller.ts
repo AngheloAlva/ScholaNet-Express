@@ -19,13 +19,14 @@ export class AssignmentController {
 
   createAssignments = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, dueDate, course, type } = req.body
+      const { title, description, dueDate, course, type, score } = req.body
       const newAssignment = await this.assignmentsService.createAssignment({
         title,
         description,
         dueDate,
         course,
-        type
+        type,
+        score
       })
       res.status(201).json(newAssignment)
     } catch (error) {
@@ -51,6 +52,31 @@ export class AssignmentController {
       const { id } = req.params
       const assignment = await this.assignmentsService.getAssignmentsById(id)
       res.status(200).json(assignment)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  updateAssignment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const data = req.body
+
+      const assignment = await this.assignmentsService.updateAssignment({ id, ...data })
+
+      res.status(200).json(assignment)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  deleteAssignment = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      await this.assignmentsService.deleteAssignment(id)
+      res.status(204).json({
+        message: 'Assignment deleted'
+      })
     } catch (error) {
       this.handleError(error, res)
     }

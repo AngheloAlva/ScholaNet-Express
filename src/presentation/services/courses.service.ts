@@ -1,4 +1,6 @@
+import { AssignmentModel } from '../../data/models/assignment'
 import { CourseModel } from '../../data/models/course'
+import { MaterialModel } from '../../data/models/material'
 import { ProgramModel } from '../../data/models/program'
 import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
@@ -66,6 +68,34 @@ export class CourseService {
       return course
     } catch (error) {
       throw CustomError.internalServerError(`Error getting course: ${error as string}`)
+    }
+  }
+
+  async getAssignmentsByCourse (courseId: string): Promise<any> {
+    try {
+      const courseDb = await CourseModel.findById(courseId)
+      if (courseDb == null) throw CustomError.notFound('Course does not exist')
+
+      const assignments = await AssignmentModel.find({ course: courseId })
+      if (assignments == null) throw CustomError.notFound('Assignments not found')
+
+      return assignments
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting assignments: ${error as string}`)
+    }
+  }
+
+  async getMaterialsByCourse (courseId: string): Promise<any> {
+    try {
+      const courseDb = await CourseModel.findById(courseId)
+      if (courseDb == null) throw CustomError.notFound('Course does not exist')
+
+      const materials = await MaterialModel.find({ course: courseId })
+      if (materials == null) throw CustomError.notFound('Materials not found')
+
+      return materials
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting materials: ${error as string}`)
     }
   }
 }

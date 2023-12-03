@@ -9,6 +9,14 @@ interface CreateAssignment {
   dueDate: Date
   course: string
   type: string
+  score: number
+}
+
+interface UpdateAssignment {
+  id: string
+  title?: string
+  description?: string
+  dueDate?: Date
   score?: number
 }
 
@@ -63,6 +71,37 @@ export class AssignmentService {
       return assignment
     } catch (error) {
       throw CustomError.internalServerError(`Error getting assignment: ${error as string}`)
+    }
+  }
+
+  async updateAssignment ({
+    id, title, description, dueDate, score
+  }: UpdateAssignment): Promise<any> {
+    try {
+      const assignment = await AssignmentModel.findById(id)
+      if (assignment == null) throw CustomError.notFound('Assignment not found')
+
+      if (title != null) assignment.title = title
+      if (description != null) assignment.description = description
+      if (dueDate != null) assignment.dueDate = dueDate
+      if (score != null) assignment.score = score
+
+      await assignment.save()
+
+      return assignment
+    } catch (error) {
+      throw CustomError.internalServerError(`Error updating assignment: ${error as string}`)
+    }
+  }
+
+  async deleteAssignment (id: string): Promise<any> {
+    try {
+      const assignment = await AssignmentModel.findById(id)
+      if (assignment == null) throw CustomError.notFound('Assignment not found')
+
+      await assignment.deleteOne()
+    } catch (error) {
+      throw CustomError.internalServerError(`Error deleting assignment: ${error as string}`)
     }
   }
 }

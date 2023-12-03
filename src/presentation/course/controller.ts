@@ -57,4 +57,24 @@ export class CourseController {
       this.handleError(error, res)
     }
   }
+
+  getAssignmentsByCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { courseId } = req.params
+      const assignments = await this.courseService.getAssignmentsByCourse(courseId)
+      res.status(200).json(assignments)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getMaterialsByCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { courseId } = req.params
+      const materials = await this.courseService.getMaterialsByCourse(courseId)
+      res.status(200).json(materials)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

@@ -29,6 +29,20 @@ export class AssignmentRoutes {
       validate
     ], controller.createAssignments)
 
+    router.put('/assignment/:id', [
+      param('id').isMongoId().optional().withMessage('Id is required'),
+      body('title').isString().optional().withMessage('Title is required'),
+      body('description').isString().optional().withMessage('Description is required'),
+      body('dueDate').isString().optional().withMessage('Due date is required'),
+      body('score').isNumeric().optional().withMessage('Score must be a number'),
+      validate
+    ], controller.updateAssignment)
+
+    router.delete('/assignment/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      validate
+    ], controller.deleteAssignment)
+
     return router
   }
 }
