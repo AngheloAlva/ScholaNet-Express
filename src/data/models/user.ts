@@ -18,7 +18,12 @@ const userSchema = new Schema({
   students: [{
     type: Schema.Types.ObjectId,
     ref: 'Student'
-  }]
+  }],
+  state: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
+  }
 })
 
 export const UserModel = mongoose.model('User', userSchema)

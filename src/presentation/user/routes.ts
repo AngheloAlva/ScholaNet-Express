@@ -28,6 +28,19 @@ export class UserRoutes {
       validate
     ], controller.createUser)
 
+    router.put('/user/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      body('name').isString().optional(),
+      body('lastName').isString().optional(),
+      body('email').isEmail().optional(),
+      validate
+    ], controller.updateUser)
+
+    router.delete('/user/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      validate
+    ], controller.deleteUser)
+
     return router
   }
 }

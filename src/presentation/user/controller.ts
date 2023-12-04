@@ -56,4 +56,34 @@ export class UserController {
       this.handleError(error, res)
     }
   }
+
+  updateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { name, lastName, email } = req.body
+
+      const user = await this.userService.updateUser({
+        id,
+        name,
+        lastName,
+        email
+      })
+
+      res.status(200).json(user)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  deleteUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      await this.userService.deleteUser(id)
+      res.status(200).json({
+        message: 'User deleted successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }
