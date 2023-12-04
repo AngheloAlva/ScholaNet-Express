@@ -6,6 +6,7 @@ import { AssignmentService } from '../services/assignments.service'
 import { AssignmentController } from './controller'
 import { body, param } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
+import { idValidation } from '../validations/idValidation'
 
 export class AssignmentRoutes {
   static get routes (): Router {
@@ -14,10 +15,7 @@ export class AssignmentRoutes {
     const controller = new AssignmentController(service)
 
     router.get('/assignments', controller.getAssignments)
-    router.get('/assignment/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.getAssignmentsById)
+    router.get('/assignment/:id', idValidation, controller.getAssignmentsById)
 
     router.post('/assignment', [
       body('title').isString().notEmpty().withMessage('Title is required'),

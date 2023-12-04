@@ -4,8 +4,9 @@
 import { Router } from 'express'
 import { MaterialService } from '../services/material.service'
 import { MaterialController } from './controller'
-import { body, param } from 'express-validator'
+import { body } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
+import { idValidation } from '../validations/idValidation'
 
 export class MaterialRoutes {
   static get routes (): Router {
@@ -14,10 +15,7 @@ export class MaterialRoutes {
     const controller = new MaterialController(service)
 
     router.get('/materials', controller.getMaterials)
-    router.get('/material/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.getMaterialById)
+    router.get('/material/:id', idValidation, controller.getMaterialById)
 
     router.post('/material', [
       body('title').isString().notEmpty().withMessage('Title is required'),

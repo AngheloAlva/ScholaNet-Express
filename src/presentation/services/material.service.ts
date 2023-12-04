@@ -16,8 +16,7 @@ export class MaterialService {
     title, description, type, url, course
   }: CreateMaterial): Promise<any> {
     try {
-      const courseExist = await CourseModel.findById(course)
-      if (courseExist == null) throw CustomError.badRequest('Course does not exist')
+      await CourseModel.findById(course)
 
       const material = new MaterialModel({
         title,

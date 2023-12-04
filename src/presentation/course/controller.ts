@@ -58,6 +58,30 @@ export class CourseController {
     }
   }
 
+  updateCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const data = req.body
+      const course = await this.courseService.updateCourse({ id, ...data })
+
+      res.status(200).json(course)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  deleteCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      await this.courseService.deleteCourse(id)
+      res.status(200).json({
+        message: 'Course deleted successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
   getAssignmentsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
       const { courseId } = req.params

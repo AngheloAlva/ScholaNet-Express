@@ -1,13 +1,14 @@
+import { type ObjectId } from 'mongoose'
 import { AssignmentModel } from '../../data/models/assignment'
-import { CourseModel } from '../../data/models/course'
 import { CustomError } from '../../domain/errors/custom.error'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
+import { verifyCourseExists } from '../../helpers/courseHelpers'
 
 interface CreateAssignment {
   title: string
   description: string
   dueDate: Date
-  course: string
+  course: ObjectId
   type: string
   score: number
 }
@@ -25,8 +26,7 @@ export class AssignmentService {
     title, description, dueDate, course, type, score
   }: CreateAssignment): Promise<any> {
     try {
-      const courseExist = await CourseModel.findById(course)
-      if (courseExist == null) throw CustomError.badRequest('Course does not exist')
+      await verifyCourseExists(course)
 
       const assignment = new AssignmentModel({
         title,

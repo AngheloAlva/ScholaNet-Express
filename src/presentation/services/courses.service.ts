@@ -4,13 +4,16 @@ import { MaterialModel } from '../../data/models/material'
 import { ProgramModel } from '../../data/models/program'
 import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
+import { verifyCourseExists } from '../../helpers/courseHelpers'
 import { type PaginationDto } from '../../domain/shared/pagination.dto'
+import { type ObjectId } from 'mongoose'
 
 interface CreateCourse {
+  id?: ObjectId
   title: string
   description: string
-  program: string
-  teacher: string
+  program: ObjectId
+  teacher: ObjectId
   image: string
   href: string
 }
@@ -60,10 +63,9 @@ export class CourseService {
     }
   }
 
-  async getCourseById (id: string): Promise<any> {
+  async getCourseById (id: ObjectId): Promise<any> {
     try {
-      const course = await CourseModel.findById(id).populate('teacher')
-      if (course == null) throw CustomError.notFound('Course not found')
+      const course = await verifyCourseExists(id)
 
       return course
     } catch (error) {
@@ -71,10 +73,57 @@ export class CourseService {
     }
   }
 
-  async getAssignmentsByCourse (courseId: string): Promise<any> {
+  async updateCourse ({ id, title, description, program, teacher, image, href }: CreateCourse): Promise<any> {
     try {
-      const courseDb = await CourseModel.findById(courseId)
-      if (courseDb == null) throw CustomError.notFound('Course does not exist')
+      const courseDb = await verifyCourseExists(id as ObjectId)
+
+      if (title != null) courseDb.title = title
+      if (description != null) courseDb.description = description
+      if (image != null) courseDb.image = image
+      if (href != null) courseDb.href = href
+
+      if (program != null) {
+        const programExist = await ProgramModel.findById(program)
+        if (programExist == null) throw CustomError.badRequest('Program does not exist')
+
+        courseDb.program = program as any
+      }
+
+      if (teacher != null) {
+        const teacherExist = await UserModel.findById(teacher).where({ role: 'teacher' })
+        if (teacherExist == null) throw CustomError.badRequest('Teacher does not exist')
+
+        courseDb.teacher = teacher as any
+      }
+
+      await courseDb.save()
+
+      return courseDb
+    } catch (error) {
+      throw CustomError.internalServerError(`Error updating course: ${error as string}`)
+    }
+  }
+
+  async deleteCourse (id: ObjectId): Promise<any> {
+    try {
+      const courseDb = await verifyCourseExists(id)
+
+      await Promise.all([
+        CourseModel.findByIdAndDelete(id),
+        ProgramModel.findByIdAndUpdate(courseDb.program, {
+          $pull: { courses: id }
+        })
+      ])
+
+      return courseDb
+    } catch (error) {
+      throw CustomError.internalServerError(`Error deleting course: ${error as string}`)
+    }
+  }
+
+  async getAssignmentsByCourse (courseId: ObjectId): Promise<any> {
+    try {
+      await verifyCourseExists(courseId)
 
       const assignments = await AssignmentModel.find({ course: courseId })
       if (assignments == null) throw CustomError.notFound('Assignments not found')
@@ -85,10 +134,9 @@ export class CourseService {
     }
   }
 
-  async getMaterialsByCourse (courseId: string): Promise<any> {
+  async getMaterialsByCourse (courseId: ObjectId): Promise<any> {
     try {
-      const courseDb = await CourseModel.findById(courseId)
-      if (courseDb == null) throw CustomError.notFound('Course does not exist')
+      await verifyCourseExists(courseId)
 
       const materials = await MaterialModel.find({ course: courseId })
       if (materials == null) throw CustomError.notFound('Materials not found')

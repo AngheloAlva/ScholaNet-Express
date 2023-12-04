@@ -6,6 +6,7 @@ import { UserService } from '../services/user.service'
 import { UserController } from './controller'
 import { body, param } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
+import { idValidation } from '../validations/idValidation'
 
 export class UserRoutes {
   static get routes (): Router {
@@ -14,10 +15,7 @@ export class UserRoutes {
     const controller = new UserController(service)
 
     router.get('/users', controller.getUsers)
-    router.get('/user/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.getUserById)
+    router.get('/user/:id', idValidation, controller.getUserById)
 
     router.post('/user', [
       body('name').isString().notEmpty().withMessage('Name is required'),
