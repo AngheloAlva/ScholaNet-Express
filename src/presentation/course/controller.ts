@@ -3,6 +3,7 @@
 import { type Request, type Response } from 'express'
 import { type CourseService } from '../services/courses.service'
 import { CustomError } from '../../domain/errors/custom.error'
+import mongoose from 'mongoose'
 
 export class CourseController {
   constructor (
@@ -50,7 +51,7 @@ export class CourseController {
 
   getCourseById = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params
+      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
       const course = await this.courseService.getCourseById(id)
       res.status(200).json(course)
     } catch (error) {
@@ -72,7 +73,7 @@ export class CourseController {
 
   deleteCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params
+      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
       await this.courseService.deleteCourse(id)
       res.status(200).json({
         message: 'Course deleted successfully'
@@ -84,7 +85,7 @@ export class CourseController {
 
   getAssignmentsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { courseId } = req.params
+      const courseId = new mongoose.Schema.Types.ObjectId(req.params.courseId)
       const assignments = await this.courseService.getAssignmentsByCourse(courseId)
       res.status(200).json(assignments)
     } catch (error) {
@@ -94,7 +95,7 @@ export class CourseController {
 
   getMaterialsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { courseId } = req.params
+      const courseId = new mongoose.Schema.Types.ObjectId(req.params.courseId)
       const materials = await this.courseService.getMaterialsByCourse(courseId)
       res.status(200).json(materials)
     } catch (error) {

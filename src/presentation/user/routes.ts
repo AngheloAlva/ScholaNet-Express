@@ -16,6 +16,10 @@ export class UserRoutes {
 
     router.get('/users', controller.getUsers)
     router.get('/user/:id', idValidation, controller.getUserById)
+    router.get('/user/rut/:rut', [
+      param('rut').isString().notEmpty().withMessage('Rut is required'),
+      validate
+    ], controller.getUserByRut)
 
     router.post('/user', [
       body('name').isString().notEmpty().withMessage('Name is required'),

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
+import mongoose from 'mongoose'
 import { CustomError } from '../../domain/errors/custom.error'
-import { type UserService } from '../services/user.service'
-import { type Request, type Response } from 'express'
+
+import type { UserService } from '../services/user.service'
+import type { Request, Response } from 'express'
 
 export class UserController {
   constructor (
@@ -49,8 +51,18 @@ export class UserController {
 
   getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params
+      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
       const user = await this.userService.getUserById(id)
+      res.status(200).json(user)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getUserByRut = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { rut } = req.params
+      const user = await this.userService.getUserByRut(rut)
       res.status(200).json(user)
     } catch (error) {
       this.handleError(error, res)
@@ -59,7 +71,7 @@ export class UserController {
 
   updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params
+      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
       const { name, lastName, email } = req.body
 
       const user = await this.userService.updateUser({
@@ -77,7 +89,7 @@ export class UserController {
 
   deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params
+      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
       await this.userService.deleteUser(id)
       res.status(200).json({
         message: 'User deleted successfully'

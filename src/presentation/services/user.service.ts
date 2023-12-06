@@ -52,6 +52,17 @@ export class UserService {
     }
   }
 
+  async getUserByRut (rut: string): Promise<any> {
+    try {
+      const user = await UserModel.findOne({ rut })
+      if (user == null) throw CustomError.notFound('User not found')
+
+      return user
+    } catch (erorr) {
+      throw CustomError.internalServerError(`Error getting user: ${erorr as string}`)
+    }
+  }
+
   async updateUser ({ id, name, lastName, email }: UpdateUser): Promise<any> {
     try {
       const userExist = await verifyUserExists(id)
