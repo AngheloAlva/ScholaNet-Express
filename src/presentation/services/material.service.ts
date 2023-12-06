@@ -1,15 +1,8 @@
-import { CourseModel } from '../../data/models/course'
-import { MaterialModel } from '../../data/models/material'
+import { CourseModel, MaterialModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
 
-interface CreateMaterial {
-  title: string
-  description: string
-  type: string
-  url: string
-  course: string
-}
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { CreateMaterial } from '../../interfaces/material.interfaces'
 
 export class MaterialService {
   async createMaterial ({

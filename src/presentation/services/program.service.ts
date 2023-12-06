@@ -1,16 +1,12 @@
-import { ProgramModel } from '../../data/models/program'
 import { CustomError } from '../../domain/errors/custom.error'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
+import { ProgramModel } from '../../data/models/index'
 
-interface CreateProgram {
-  name: string
-  description: string
-}
+import type { CreateProgram } from '../../interfaces/program.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
 
 export class ProgramService {
   async createProgram ({ name, description }: CreateProgram): Promise<any> {
     const programExist = await ProgramModel.findOne({ name })
-
     if (programExist != null) {
       throw CustomError.badRequest('Program already exists')
     }

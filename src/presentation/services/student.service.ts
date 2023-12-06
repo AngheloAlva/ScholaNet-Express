@@ -1,20 +1,11 @@
-import { ProgramModel } from '../../data/models/program'
-import { StudentModel } from '../../data/models/student'
-import { UserModel } from '../../data/models/user'
-import { CustomError } from '../../domain/errors/custom.error'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
-
 import bcrypt from 'bcrypt'
 
-interface CreateStudent {
-  name: string
-  lastName: string
-  dateOfBirth: Date
-  password: string
-  rut: string
-  program: string
-  guardian: string
-}
+import { CustomError } from '../../domain/errors/custom.error'
+import { StudentModel } from '../../data/models/index'
+import { verifyProgramExists, verifyGuardianExist } from '../../helpers'
+
+import type { CreateStudent } from '../../interfaces/student.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
 
 export class StudentService {
   async createStudent ({
@@ -24,11 +15,8 @@ export class StudentService {
       const studentDB = await StudentModel.findOne({ rut })
       if (studentDB != null) throw CustomError.badRequest('Student already exists')
 
-      const guardianExist = await UserModel.findById(guardian).where({ role: 'guardian' })
-      if (guardianExist == null) throw CustomError.badRequest('Guardian does not exist')
-
-      const programExist = await ProgramModel.findById(program)
-      if (programExist == null) throw CustomError.badRequest('Program does not exist')
+      const guardianExist = await verifyGuardianExist(guardian)
+      await verifyProgramExists(program)
 
       const salt = await bcrypt.genSalt(10)
       password = await bcrypt.hash(password, salt)

@@ -1,21 +1,10 @@
-import { UserModel } from '../../data/models/user'
 import { CustomError } from '../../domain/errors/custom.error'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
+import { verifyUserExists } from '../../helpers/userHelpers'
+import { UserModel } from '../../data/models/index'
 
-interface CreateUser {
-  name: string
-  lastName: string
-  rut: string
-  email: string
-  role: string
-}
-
-interface UpdateUser {
-  id: string
-  name?: string
-  lastName?: string
-  email?: string
-}
+import type { UpdateUser, CreateUser } from '../../interfaces/user.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { ObjectId } from 'mongoose'
 
 export class UserService {
   async createUser ({
@@ -54,11 +43,9 @@ export class UserService {
     }
   }
 
-  async getUserById (id: string): Promise<any> {
+  async getUserById (id: ObjectId): Promise<any> {
     try {
-      const user = await UserModel.findById(id)
-      if (user == null) throw CustomError.notFound('User not found')
-
+      const user = await verifyUserExists(id)
       return user
     } catch (error) {
       throw CustomError.internalServerError(`Error getting user: ${error as string}`)
@@ -67,8 +54,7 @@ export class UserService {
 
   async updateUser ({ id, name, lastName, email }: UpdateUser): Promise<any> {
     try {
-      const userExist = await UserModel.findById(id)
-      if (userExist == null) throw CustomError.notFound('User not found')
+      const userExist = await verifyUserExists(id)
 
       if (name != null) userExist.name = name
       if (lastName != null) userExist.lastName = lastName
@@ -82,11 +68,9 @@ export class UserService {
     }
   }
 
-  async deleteUser (id: string): Promise<void> {
+  async deleteUser (id: ObjectId): Promise<void> {
     try {
-      const userExist = await UserModel.findById(id)
-      if (userExist == null) throw CustomError.notFound('User not found')
-
+      const userExist = await verifyUserExists(id)
       userExist.state = 'inactive'
 
       await userExist.save()

@@ -1,37 +1,24 @@
-import { AssignmentModel } from '../../data/models/assignment'
-import { CourseModel } from '../../data/models/course'
-import { MaterialModel } from '../../data/models/material'
-import { ProgramModel } from '../../data/models/program'
-import { UserModel } from '../../data/models/user'
+import { CourseModel, ProgramModel, MaterialModel } from '../../data/models/index'
+import { verifyCourseExists, verifyProgramExists } from '../../helpers/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { verifyCourseExists } from '../../helpers/courseHelpers'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
-import { type ObjectId } from 'mongoose'
+import { AssignmentModel } from '../../data/models/assignment'
+import { verifyTeacherExists } from '../../helpers/userHelpers'
 
-interface CreateCourse {
-  id?: ObjectId
-  title: string
-  description: string
-  program: ObjectId
-  teacher: ObjectId
-  image: string
-  href: string
-}
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { CreateCourse } from '../../interfaces/course.interfaces'
+import type { ObjectId } from 'mongoose'
 
 export class CourseService {
   async createCourse ({
     title, description, program, teacher, image, href
   }: CreateCourse): Promise<any> {
-    const courseExist = await CourseModel.findOne({ title })
-    if (courseExist != null) throw CustomError.badRequest('Course already exists')
-
-    const teacherExist = await UserModel.findById(teacher).where({ role: 'teacher' })
-    if (teacherExist == null) throw CustomError.badRequest('Teacher does not exist')
-
-    const programExist = await ProgramModel.findById(program)
-    if (programExist == null) throw CustomError.badRequest('Program does not exist')
-
     try {
+      const courseExist = await CourseModel.findOne({ title })
+      if (courseExist != null) throw CustomError.badRequest('Course already exists')
+
+      await verifyTeacherExists(teacher)
+      await verifyProgramExists(program)
+
       const course = new CourseModel({ title, description, program, teacher, image, href })
       await course.save()
 
@@ -83,16 +70,12 @@ export class CourseService {
       if (href != null) courseDb.href = href
 
       if (program != null) {
-        const programExist = await ProgramModel.findById(program)
-        if (programExist == null) throw CustomError.badRequest('Program does not exist')
-
+        await verifyProgramExists(program)
         courseDb.program = program as any
       }
 
       if (teacher != null) {
-        const teacherExist = await UserModel.findById(teacher).where({ role: 'teacher' })
-        if (teacherExist == null) throw CustomError.badRequest('Teacher does not exist')
-
+        await verifyTeacherExists(teacher)
         courseDb.teacher = teacher as any
       }
 

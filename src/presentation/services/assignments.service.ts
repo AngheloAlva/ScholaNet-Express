@@ -1,25 +1,10 @@
-import { type ObjectId } from 'mongoose'
-import { AssignmentModel } from '../../data/models/assignment'
+import { verifyAssignmentExists, verifyCourseExists } from '../../helpers/index'
+import { AssignmentModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { type PaginationDto } from '../../domain/shared/pagination.dto'
-import { verifyCourseExists } from '../../helpers/courseHelpers'
 
-interface CreateAssignment {
-  title: string
-  description: string
-  dueDate: Date
-  course: ObjectId
-  type: string
-  score: number
-}
-
-interface UpdateAssignment {
-  id: string
-  title?: string
-  description?: string
-  dueDate?: Date
-  score?: number
-}
+import type { CreateAssignment, UpdateAssignment } from '../../interfaces/assignment.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { ObjectId } from 'mongoose'
 
 export class AssignmentService {
   async createAssignment ({
@@ -63,10 +48,9 @@ export class AssignmentService {
     }
   }
 
-  async getAssignmentsById (id: string): Promise<any> {
+  async getAssignmentsById (id: ObjectId): Promise<any> {
     try {
-      const assignment = await AssignmentModel.findById(id)
-      if (assignment == null) throw CustomError.notFound('Assignment not found')
+      const assignment = await verifyAssignmentExists(id)
 
       return assignment
     } catch (error) {
@@ -78,8 +62,7 @@ export class AssignmentService {
     id, title, description, dueDate, score
   }: UpdateAssignment): Promise<any> {
     try {
-      const assignment = await AssignmentModel.findById(id)
-      if (assignment == null) throw CustomError.notFound('Assignment not found')
+      const assignment = await verifyAssignmentExists(id)
 
       if (title != null) assignment.title = title
       if (description != null) assignment.description = description
@@ -94,10 +77,9 @@ export class AssignmentService {
     }
   }
 
-  async deleteAssignment (id: string): Promise<any> {
+  async deleteAssignment (id: ObjectId): Promise<any> {
     try {
-      const assignment = await AssignmentModel.findById(id)
-      if (assignment == null) throw CustomError.notFound('Assignment not found')
+      const assignment = await verifyAssignmentExists(id)
 
       await assignment.deleteOne()
     } catch (error) {

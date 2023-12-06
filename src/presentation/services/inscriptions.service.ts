@@ -1,38 +1,29 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
-import { CourseModel } from '../../data/models/course'
-import { InscriptionModel } from '../../data/models/inscription'
+import { CourseModel, InscriptionModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import { StudentService } from './student.service'
 
-interface CreateInscriptionProps {
-  name: string
-  lastName: string
-  dateOfBirth: Date
-  password: string
-  rut: string
-  program: string
-  guardian: string
-}
+import type { CreateInscriptionProps } from '../../interfaces/inscription.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
 
 export class InscriptionService {
   async createInscription ({
     name, lastName, dateOfBirth, password, rut, program, guardian
   }: CreateInscriptionProps): Promise<unknown> {
-    const studentService = new StudentService()
-    const studentId = await studentService.createStudent({
-      name,
-      lastName,
-      dateOfBirth,
-      password,
-      rut,
-      program,
-      guardian
-    })
-
     try {
+      const studentService = new StudentService()
+      const studentId = await studentService.createStudent({
+        name,
+        lastName,
+        dateOfBirth,
+        password,
+        rut,
+        program,
+        guardian
+      })
+
       const inscription = new InscriptionModel({
         student: studentId,
         program
