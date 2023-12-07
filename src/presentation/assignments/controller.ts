@@ -63,7 +63,7 @@ export class AssignmentController {
       const { id } = req.params
       const data = req.body
 
-      const assignment = await this.assignmentsService.updateAssignment({ id, ...data })
+      const assignment = await this.assignmentsService.updateAssignment({ id: id as unknown as ObjectId, ...data })
 
       res.status(200).json(assignment)
     } catch (error) {
