@@ -16,7 +16,7 @@ export class InscriptionRoutes {
     const controller = new InscriptionController(inscriptionService)
 
     router.get('/inscriptions', controller.getInscriptions)
-    router.get('/inscriptions/:id', idValidation, controller.getInscriptionById)
+    router.get('/inscription/:id', idValidation, controller.getInscriptionById)
 
     router.post('/inscription', [
       body('name').isString().notEmpty().withMessage('Name is required'),

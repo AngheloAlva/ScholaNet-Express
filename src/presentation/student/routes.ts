@@ -19,9 +19,9 @@ export class StudentRoutes {
 
     router.put('/student/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
-      body('password').isString().notEmpty().withMessage('Password must be a string'),
-      body('program').isMongoId().notEmpty().withMessage('Program must be a valid MongoId'),
-      body('guardian').isMongoId().notEmpty().withMessage('Guardian must be a valid MongoId'),
+      body('password').isString().optional(),
+      body('program').isMongoId().optional(),
+      body('guardian').isMongoId().optional(),
       validate
     ], controller.updateStudent)
 
