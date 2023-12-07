@@ -1,11 +1,13 @@
 import bcrypt from 'bcrypt'
 
+import { verifyProgramExists, verifyGuardianExist } from '../../helpers'
 import { CustomError } from '../../domain/errors/custom.error'
 import { StudentModel } from '../../data/models/index'
-import { verifyProgramExists, verifyGuardianExist } from '../../helpers'
 
-import type { CreateStudent } from '../../interfaces/student.interfaces'
+import type { CreateStudent, UpdateStudent } from '../../interfaces/student.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { ObjectId } from 'mongoose'
+import type mongoose from 'mongoose'
 
 export class StudentService {
   async createStudent ({
@@ -58,6 +60,47 @@ export class StudentService {
       return student
     } catch (error) {
       throw CustomError.internalServerError(`Error getting student: ${error as string}`)
+    }
+  }
+
+  async updateStudent ({ id, password, program, guardian }: UpdateStudent): Promise<any> {
+    try {
+      const student = await StudentModel.findById(id)
+      if (student == null) throw CustomError.notFound('Student not found')
+
+      if (password != null) {
+        const salt = await bcrypt.genSalt(10)
+        password = await bcrypt.hash(password, salt)
+        student.password = password
+      }
+
+      if (program != null) {
+        await verifyProgramExists(program)
+        student.program = program as unknown as mongoose.Types.ObjectId
+      }
+
+      if (guardian != null) {
+        await verifyGuardianExist(guardian)
+        student.guardian = guardian as unknown as mongoose.Types.ObjectId
+      }
+
+      await student.save()
+
+      return student
+    } catch (error) {
+      throw CustomError.internalServerError(`Error updating student: ${error as string}`)
+    }
+  }
+
+  async deleteStudent (id: ObjectId): Promise<void> {
+    try {
+      const student = await StudentModel.findById(id)
+      if (student == null) throw CustomError.notFound('Student not found')
+
+      student.state = 'inactive'
+      await student.save()
+    } catch (error) {
+      throw CustomError.internalServerError(`Error deleting student: ${error as string}`)
     }
   }
 }

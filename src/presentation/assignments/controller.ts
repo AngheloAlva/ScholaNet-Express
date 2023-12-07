@@ -2,7 +2,7 @@
 import { type Request, type Response } from 'express'
 import { type AssignmentService } from '../services/assignments.service'
 import { CustomError } from '../../domain/errors/custom.error'
-import mongoose from 'mongoose'
+import type { ObjectId } from 'mongoose'
 
 export class AssignmentController {
   constructor (
@@ -50,8 +50,8 @@ export class AssignmentController {
 
   getAssignmentsById = async (req: Request, res: Response): Promise<void> => {
     try {
-      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
-      const assignment = await this.assignmentsService.getAssignmentsById(id)
+      const { id } = req.params
+      const assignment = await this.assignmentsService.getAssignmentsById(id as unknown as ObjectId)
       res.status(200).json(assignment)
     } catch (error) {
       this.handleError(error, res)
@@ -73,8 +73,8 @@ export class AssignmentController {
 
   deleteAssignment = async (req: Request, res: Response): Promise<void> => {
     try {
-      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
-      await this.assignmentsService.deleteAssignment(id)
+      const { id } = req.params
+      await this.assignmentsService.deleteAssignment(id as unknown as ObjectId)
       res.status(204).json({
         message: 'Assignment deleted'
       })

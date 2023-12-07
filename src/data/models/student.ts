@@ -16,6 +16,11 @@ const studentSchema = new Schema({
   program: {
     type: Schema.Types.ObjectId,
     ref: 'Program'
+  },
+  state: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
   }
 })
 

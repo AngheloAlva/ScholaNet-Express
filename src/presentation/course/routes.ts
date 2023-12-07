@@ -46,10 +46,7 @@ export class CourseRoutes {
       validate
     ], controller.updateCourse)
 
-    router.delete('/course/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.deleteCourse)
+    router.delete('/course/:id', idValidation, controller.deleteCourse)
 
     return router
   }

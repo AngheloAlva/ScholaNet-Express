@@ -4,7 +4,7 @@
 import { Router } from 'express'
 import { MaterialService } from '../services/material.service'
 import { MaterialController } from './controller'
-import { body } from 'express-validator'
+import { body, param } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
 import { idValidation } from '../validations/idValidation'
 
@@ -26,6 +26,16 @@ export class MaterialRoutes {
       validate
     ], controller.createMaterial)
 
+    router.put('/material/:id', [
+      param('id').isMongoId().notEmpty().withMessage('Id is required'),
+      body('title').isString().optional(),
+      body('description').isString().optional(),
+      body('type').isString().isIn(['pdf', 'link', 'file']).optional(),
+      body('url').isURL().optional(),
+      validate
+    ], controller.updateMaterial)
+
+    router.delete('/material/:id', idValidation, controller.deleteMaterial)
     return router
   }
 }

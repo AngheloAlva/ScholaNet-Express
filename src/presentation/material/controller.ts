@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { CustomError } from '../../domain/errors/custom.error'
+
 import { type MaterialService } from '../services/material.service'
 import { type Response, type Request } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class MaterialController {
   constructor (
@@ -52,6 +54,30 @@ export class MaterialController {
       const { id } = req.params
       const material = await this.materialService.getMaterialById(id)
       res.status(200).json(material)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  updateMaterial = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const data = req.body
+
+      const updatedMaterial = await this.materialService.updateMaterial({ id, ...data })
+
+      res.status(200).json(updatedMaterial)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  deleteMaterial = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      await this.materialService.deleteMaterial(id as unknown as ObjectId)
+
+      res.status(200).json({ message: 'Material deleted successfully' })
     } catch (error) {
       this.handleError(error, res)
     }

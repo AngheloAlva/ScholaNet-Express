@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
-import type { Request, Response } from 'express'
-import type { InscriptionService } from '../services/inscriptions.service'
 import { CustomError } from '../../domain/errors/custom.error'
+
+import type { InscriptionService } from '../services/inscriptions.service'
+import type { Request, Response } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class InscriptionController {
   constructor (
@@ -45,6 +47,16 @@ export class InscriptionController {
         limit: Number(limit)
       })
       res.status(200).json(inscriptions)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getInscriptionById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const inscription = await this.inscriptionService.getInscriptionById(id as unknown as ObjectId)
+      res.status(200).json(inscription)
     } catch (error) {
       this.handleError(error, res)
     }

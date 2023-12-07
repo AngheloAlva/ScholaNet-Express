@@ -36,10 +36,7 @@ export class AssignmentRoutes {
       validate
     ], controller.updateAssignment)
 
-    router.delete('/assignment/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.deleteAssignment)
+    router.delete('/assignment/:id', idValidation, controller.deleteAssignment)
 
     return router
   }

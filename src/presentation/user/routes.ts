@@ -38,10 +38,7 @@ export class UserRoutes {
       validate
     ], controller.updateUser)
 
-    router.delete('/user/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.deleteUser)
+    router.delete('/user/:id', idValidation, controller.deleteUser)
 
     return router
   }

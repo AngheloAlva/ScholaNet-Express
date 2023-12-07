@@ -1,8 +1,9 @@
 import { CourseModel, MaterialModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
 
+import type { CreateMaterial, UpdateMaterial } from '../../interfaces/material.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
-import type { CreateMaterial } from '../../interfaces/material.interfaces'
+import type { ObjectId } from 'mongoose'
 
 export class MaterialService {
   async createMaterial ({
@@ -52,6 +53,37 @@ export class MaterialService {
       return material
     } catch (error) {
       throw CustomError.internalServerError(`Error getting material: ${error as string}`)
+    }
+  }
+
+  async updateMaterial ({
+    id, title, description, type, url
+  }: UpdateMaterial): Promise<any> {
+    try {
+      const material = await MaterialModel.findById(id)
+      if (material == null) throw CustomError.notFound('Material not found')
+
+      if (title != null) material.title = title
+      if (description != null) material.description = description
+      if (type != null) material.type = type
+      if (url != null) material.url = url
+
+      await material.save()
+
+      return material
+    } catch (error) {
+      throw CustomError.internalServerError(`Error updating material: ${error as string}`)
+    }
+  }
+
+  async deleteMaterial (id: ObjectId): Promise<any> {
+    try {
+      const material = await MaterialModel.findById(id)
+      if (material == null) throw CustomError.notFound('Material not found')
+
+      await material.deleteOne()
+    } catch (error) {
+      throw CustomError.internalServerError(`Error deleting material: ${error as string}`)
     }
   }
 }

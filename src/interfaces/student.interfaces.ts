@@ -9,3 +9,10 @@ export interface CreateStudent {
   program: ObjectId
   guardian: ObjectId
 }
+
+export interface UpdateStudent {
+  id: ObjectId
+  password?: string
+  program?: ObjectId
+  guardian?: ObjectId
+}

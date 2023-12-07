@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
-import { type Request, type Response } from 'express'
-import { type CourseService } from '../services/courses.service'
 import { CustomError } from '../../domain/errors/custom.error'
-import mongoose from 'mongoose'
+
+import { type CourseService } from '../services/courses.service'
+import { type Request, type Response } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class CourseController {
   constructor (
@@ -51,8 +52,8 @@ export class CourseController {
 
   getCourseById = async (req: Request, res: Response): Promise<void> => {
     try {
-      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
-      const course = await this.courseService.getCourseById(id)
+      const { id } = req.params
+      const course = await this.courseService.getCourseById(id as unknown as ObjectId)
       res.status(200).json(course)
     } catch (error) {
       this.handleError(error, res)
@@ -73,8 +74,8 @@ export class CourseController {
 
   deleteCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const id = new mongoose.Schema.Types.ObjectId(req.params.id)
-      await this.courseService.deleteCourse(id)
+      const { id } = req.params
+      await this.courseService.deleteCourse(id as unknown as ObjectId)
       res.status(200).json({
         message: 'Course deleted successfully'
       })
@@ -85,8 +86,8 @@ export class CourseController {
 
   getAssignmentsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const courseId = new mongoose.Schema.Types.ObjectId(req.params.courseId)
-      const assignments = await this.courseService.getAssignmentsByCourse(courseId)
+      const { courseId } = req.params
+      const assignments = await this.courseService.getAssignmentsByCourse(courseId as unknown as ObjectId)
       res.status(200).json(assignments)
     } catch (error) {
       this.handleError(error, res)
@@ -95,8 +96,8 @@ export class CourseController {
 
   getMaterialsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const courseId = new mongoose.Schema.Types.ObjectId(req.params.courseId)
-      const materials = await this.courseService.getMaterialsByCourse(courseId)
+      const { courseId } = req.params
+      const materials = await this.courseService.getMaterialsByCourse(courseId as unknown as ObjectId)
       res.status(200).json(materials)
     } catch (error) {
       this.handleError(error, res)

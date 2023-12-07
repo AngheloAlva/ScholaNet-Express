@@ -7,6 +7,7 @@ import { StudentService } from './student.service'
 
 import type { CreateInscriptionProps } from '../../interfaces/inscription.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { ObjectId } from 'mongoose'
 
 export class InscriptionService {
   async createInscription ({
@@ -58,6 +59,22 @@ export class InscriptionService {
       }
     } catch (error) {
       throw CustomError.internalServerError(`Error getting inscriptions: ${error as string}`)
+    }
+  }
+
+  async getInscriptionById (id: ObjectId): Promise<any> {
+    try {
+      const inscription = await InscriptionModel.findById(id)
+        .populate('student')
+        .populate('program')
+
+      if (!inscription) {
+        throw CustomError.notFound('Inscription not found')
+      }
+
+      return inscription
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting inscription by id: ${error as string}`)
     }
   }
 }

@@ -80,6 +80,7 @@ export class AssignmentService {
   async deleteAssignment (id: ObjectId): Promise<any> {
     try {
       const assignment = await verifyAssignmentExists(id)
+      if (assignment == null) throw CustomError.notFound('Assignment not found')
 
       await assignment.deleteOne()
     } catch (error) {

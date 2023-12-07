@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { CustomError } from '../../domain/errors/custom.error'
-import { type StudentService } from '../services/student.service'
-import { type Response } from 'express'
+
+import type { StudentService } from '../services/student.service'
+import type { Request, Response } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class StudentController {
   constructor (
@@ -18,7 +20,7 @@ export class StudentController {
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  getStudents = async (req: any, res: Response): Promise<void> => {
+  getStudents = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
       const students = await this.studentService.getStudents({
@@ -31,11 +33,40 @@ export class StudentController {
     }
   }
 
-  getStudentById = async (req: any, res: Response): Promise<void> => {
+  getStudentById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
       const student = await this.studentService.getStudentById(id)
       res.status(200).json(student)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  updateStudent = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { password, program, guardian } = req.body
+
+      const student = await this.studentService.updateStudent({
+        id: id as unknown as ObjectId,
+        password,
+        program,
+        guardian
+      })
+
+      res.status(200).json(student)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  deleteStudent = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      await this.studentService.deleteStudent(id as unknown as ObjectId)
+
+      res.status(200).json({ message: 'Student deleted successfully' })
     } catch (error) {
       this.handleError(error, res)
     }

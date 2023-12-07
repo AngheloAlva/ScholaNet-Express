@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-import { Router } from 'express'
 import { body } from 'express-validator'
-import { InscriptionController } from './controller'
-import { validate } from '../../middlewares/validation.middleware'
+
 import { InscriptionService } from '../services/inscriptions.service'
+import { validate } from '../../middlewares/validation.middleware'
+import { idValidation } from '../validations/idValidation'
+import { InscriptionController } from './controller'
+import { Router } from 'express'
 
 export class InscriptionRoutes {
   static get routes (): Router {
@@ -14,6 +16,7 @@ export class InscriptionRoutes {
     const controller = new InscriptionController(inscriptionService)
 
     router.get('/inscriptions', controller.getInscriptions)
+    router.get('/inscriptions/:id', idValidation, controller.getInscriptionById)
 
     router.post('/inscription', [
       body('name').isString().notEmpty().withMessage('Name is required'),

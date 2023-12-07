@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
 import { CustomError } from '../../domain/errors/custom.error'
-import { type ProgramService } from '../services/program.service'
-import { type Request, type Response } from 'express'
+
+import type { ProgramService } from '../services/program.service'
+import type { Request, Response } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class ProgramController {
   constructor (
@@ -47,7 +49,25 @@ export class ProgramController {
   getProgramById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const program = await this.programServise.getProgramById(id)
+      const program = await this.programServise.getProgramById(id as unknown as ObjectId)
+      res.status(200).json(program)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  updateProgram = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { name, description, courses } = req.body
+
+      const program = await this.programServise.updateProgram({
+        id: id as unknown as ObjectId,
+        name,
+        description,
+        courses
+      })
+
       res.status(200).json(program)
     } catch (error) {
       this.handleError(error, res)
