@@ -6,6 +6,7 @@ export interface User {
   lastName: string
   rut: string
   email: string
+  password: string
   role: 'guardian' | 'teacher' | 'admin'
   state: 'active' | 'inactive'
   students: Array<{
@@ -23,6 +24,7 @@ export interface CreateUser {
   lastName: string
   rut: string
   email: string
+  password: string
   role: string
 }
 
@@ -31,4 +33,9 @@ export interface UpdateUser {
   name?: string
   lastName?: string
   email?: string
+}
+
+export interface LoginUser {
+  email: string
+  password: string
 }

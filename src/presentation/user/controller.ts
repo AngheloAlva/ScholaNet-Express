@@ -22,12 +22,13 @@ export class UserController {
 
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, lastName, rut, email, role } = req.body
+      const { name, lastName, rut, email, role, password } = req.body
       const newUser = await this.userService.createUser({
         name,
         lastName,
         rut,
         email,
+        password,
         role
       })
       res.status(201).json(newUser)
@@ -94,6 +95,17 @@ export class UserController {
       res.status(200).json({
         message: 'User deleted successfully'
       })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  loginUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, password } = req.body
+      const token = await this.userService.loginUser({ email, password })
+
+      res.status(200).json({ token })
     } catch (error) {
       this.handleError(error, res)
     }

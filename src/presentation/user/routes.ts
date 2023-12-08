@@ -29,6 +29,11 @@ export class UserRoutes {
       body('role').isString().notEmpty().isIn(['guardian', 'teacher', 'admin']).withMessage('Role is required, must be one of [user, teacher, admin]'),
       validate
     ], controller.createUser)
+    router.post('/user/login', [
+      body('email').isEmail().withMessage('Email is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      validate
+    ], controller.loginUser)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),
