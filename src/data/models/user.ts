@@ -34,7 +34,8 @@ const userSchema = new Schema({
   emailVefiried: {
     type: Boolean,
     default: false
-  }
+  },
+  resetPasswordToken: String
 })
 
 export const UserModel = mongoose.model('User', userSchema)

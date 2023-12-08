@@ -115,23 +115,67 @@ export class UserService {
   }
 
   async loginUser ({ email, password }: LoginUser): Promise<any> {
-    const user = await UserModel.findOne({ email })
-    if (user == null) throw CustomError.notFound('User not found')
+    try {
+      const user = await UserModel.findOne({ email })
+      if (user == null) throw CustomError.notFound('User not found')
 
-    const validPassword = await bcrypt.compare(password, user.password)
-    if (!validPassword) throw CustomError.badRequest('Invalid password')
+      const validPassword = await bcrypt.compare(password, user.password)
+      if (!validPassword) throw CustomError.badRequest('Invalid password')
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, envs.TOKEN_SECRET)
-    return token
+      const token = jwt.sign({ userId: user._id, role: user.role }, envs.TOKEN_SECRET)
+      return token
+    } catch (error) {
+      throw CustomError.internalServerError(`Error logging in user: ${error as string}`)
+    }
   }
 
   async verifyUser (email: string, code: string): Promise<void> {
-    const user = await UserModel.findOne({ email })
-    if (user == null) throw CustomError.notFound('User not found')
+    try {
+      const user = await UserModel.findOne({ email })
+      if (user == null) throw CustomError.notFound('User not found')
 
-    if (user.verificationCode !== code) throw CustomError.badRequest('Invalid code')
+      if (user.verificationCode !== code) throw CustomError.badRequest('Invalid code')
 
-    user.emailVefiried = true
-    await user.save()
+      user.emailVefiried = true
+      await user.save()
+    } catch (error) {
+      throw CustomError.internalServerError(`Error verifying user: ${error as string}`)
+    }
+  }
+
+  async handlePasswordResetRequest (email: string): Promise<void> {
+    try {
+      const user = await UserModel.findOne({ email })
+      if (user == null) throw CustomError.notFound('User not found')
+
+      const resetToken = jwt.sign({ userId: user._id }, envs.TOKEN_SECRET, { expiresIn: '5m' })
+
+      user.resetPasswordToken = resetToken
+      await user.save()
+
+      const resetLink = `${envs.CLIENT_URL}/reset-password/${resetToken}`
+      const subject = 'Reset your password'
+      const text = `Click on this link to reset your password: ${resetLink}`
+      const html = `<p>Click on this link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`
+      await sendEmail(email, subject, text, html)
+    } catch (error) {
+      throw CustomError.internalServerError(`Error requesting password reset: ${error as string}`)
+    }
+  }
+
+  async resetPassword (token: string, password: string): Promise<void> {
+    try {
+      const decodedToken = jwt.verify(token, envs.TOKEN_SECRET) as { userId: ObjectId }
+      const user = await UserModel.findById(decodedToken.userId)
+      if (user == null) throw CustomError.notFound('User not found')
+
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(password, salt)
+
+      user.password = hashedPassword
+      await user.save()
+    } catch (error) {
+      throw CustomError.internalServerError(`Error resetting password: ${error as string}`)
+    }
   }
 }

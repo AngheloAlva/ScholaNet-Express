@@ -122,4 +122,30 @@ export class UserController {
       this.handleError(error, res)
     }
   }
+
+  requestPasswordReset = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body
+      await this.userService.handlePasswordResetRequest(email)
+
+      res.status(200).json({
+        message: 'Password reset request sent successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token, password } = req.body
+      await this.userService.resetPassword(token, password)
+
+      res.status(200).json({
+        message: 'Password reset successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

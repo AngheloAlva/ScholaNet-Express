@@ -39,6 +39,15 @@ export class UserRoutes {
       body('code').isString().notEmpty().withMessage('Verification code is required'),
       validate
     ], controller.verifyUser)
+    router.post('/user/request-password-reset', [
+      body('email').isEmail().withMessage('Email is required'),
+      validate
+    ], controller.requestPasswordReset)
+    router.post('/user/reset-password', [
+      body('token').isString().notEmpty().withMessage('Token is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      validate
+    ], controller.resetPassword)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),
