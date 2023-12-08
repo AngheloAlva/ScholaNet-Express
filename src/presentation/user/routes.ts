@@ -34,6 +34,11 @@ export class UserRoutes {
       body('password').isString().notEmpty().withMessage('Password is required'),
       validate
     ], controller.loginUser)
+    router.post('/user/verify', [
+      body('email').isEmail().withMessage('Email is required'),
+      body('code').isString().notEmpty().withMessage('Verification code is required'),
+      validate
+    ], controller.verifyUser)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),

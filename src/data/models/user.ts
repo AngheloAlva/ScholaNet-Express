@@ -29,6 +29,11 @@ const userSchema = new Schema({
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
+  },
+  verificationCode: String,
+  emailVefiried: {
+    type: Boolean,
+    default: false
   }
 })
 

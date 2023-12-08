@@ -110,4 +110,16 @@ export class UserController {
       this.handleError(error, res)
     }
   }
+
+  verifyUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, code } = req.body
+      await this.userService.verifyUser(email, code)
+      res.status(200).json({
+        message: 'User verified successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

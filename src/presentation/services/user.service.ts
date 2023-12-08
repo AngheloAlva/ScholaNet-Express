@@ -9,6 +9,8 @@ import type { UpdateUser, CreateUser, LoginUser } from '../../interfaces/user.in
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
 import { envs } from '../../config/envs'
+import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
+import { sendEmail } from '../../utils/sendGridMailer'
 
 export class UserService {
   async createUser ({
@@ -24,8 +26,23 @@ export class UserService {
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(password, salt)
 
-      const newUser = new UserModel({ name, lastName, rut, email, password: hashedPassword })
+      const verificationCode = generateVerificationCode()
+
+      const newUser = new UserModel({
+        name,
+        lastName,
+        rut,
+        email,
+        password: hashedPassword,
+        verificationCode,
+        emailVefiried: false
+      })
       await newUser.save()
+
+      const subject = 'Verify your email'
+      const text = `Your verification code is: ${verificationCode}`
+      const html = `<p>Your verification code is: <strong>${verificationCode}</strong></p>`
+      await sendEmail(email, subject, text, html)
 
       return newUser
     } catch (error) {
@@ -106,5 +123,15 @@ export class UserService {
 
     const token = jwt.sign({ userId: user._id, role: user.role }, envs.TOKEN_SECRET)
     return token
+  }
+
+  async verifyUser (email: string, code: string): Promise<void> {
+    const user = await UserModel.findOne({ email })
+    if (user == null) throw CustomError.notFound('User not found')
+
+    if (user.verificationCode !== code) throw CustomError.badRequest('Invalid code')
+
+    user.emailVefiried = true
+    await user.save()
   }
 }
