@@ -118,6 +118,7 @@ export class UserService {
     try {
       const user = await UserModel.findOne({ email })
       if (user == null) throw CustomError.notFound('User not found')
+      if (!user.emailVefiried) throw CustomError.badRequest('User not verified')
 
       const validPassword = await bcrypt.compare(password, user.password)
       if (!validPassword) throw CustomError.badRequest('Invalid password')
