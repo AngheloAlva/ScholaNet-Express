@@ -2,10 +2,12 @@ import { type ObjectId } from 'mongoose'
 
 export interface User {
   save: () => unknown
+  _id: ObjectId
   name: string
   lastName: string
   rut: string
   email: string
+  password: string
   role: 'guardian' | 'teacher' | 'admin'
   state: 'active' | 'inactive'
   students: Array<{
@@ -23,7 +25,7 @@ export interface CreateUser {
   lastName: string
   rut: string
   email: string
-  role: string
+  password: string
 }
 
 export interface UpdateUser {
@@ -31,4 +33,9 @@ export interface UpdateUser {
   name?: string
   lastName?: string
   email?: string
+}
+
+export interface LoginUser {
+  email: string
+  password: string
 }

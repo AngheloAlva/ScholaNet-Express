@@ -26,9 +26,32 @@ export class UserRoutes {
       body('lastName').isString().notEmpty().withMessage('Last name is required'),
       body('rut').isString().notEmpty().withMessage('Rut is required'),
       body('email').isEmail().withMessage('Email is required'),
-      body('role').isString().notEmpty().isIn(['guardian', 'teacher', 'admin']).withMessage('Role is required, must be one of [user, teacher, admin]'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
       validate
     ], controller.createUser)
+    router.post('/user/login', [
+      body('email').isEmail().withMessage('Email is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      validate
+    ], controller.loginUser)
+    router.post('/user/verify', [
+      body('email').isEmail().withMessage('Email is required'),
+      body('code').isString().notEmpty().withMessage('Verification code is required'),
+      validate
+    ], controller.verifyUser)
+    router.post('/user/request-password-reset', [
+      body('email').isEmail().withMessage('Email is required'),
+      validate
+    ], controller.requestPasswordReset)
+    router.post('/user/reset-password', [
+      body('token').isString().notEmpty().withMessage('Token is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      validate
+    ], controller.resetPassword)
+    router.post('/user/refresh-token', [
+      body('refreshToken').isString().notEmpty().withMessage('Refresh token is required'),
+      validate
+    ], controller.refreshToken)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),

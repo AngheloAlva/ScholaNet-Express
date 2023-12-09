@@ -22,13 +22,13 @@ export class UserController {
 
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, lastName, rut, email, role } = req.body
+      const { name, lastName, rut, email, password } = req.body
       const newUser = await this.userService.createUser({
         name,
         lastName,
         rut,
         email,
-        role
+        password
       })
       res.status(201).json(newUser)
     } catch (error) {
@@ -93,6 +93,73 @@ export class UserController {
       await this.userService.deleteUser(id as unknown as ObjectId)
       res.status(200).json({
         message: 'User deleted successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  loginUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, password } = req.body
+      const { token, refreshToken } = await this.userService.loginUser({ email, password })
+
+      res.status(200).json({ token, refreshToken })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  refreshToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { refreshToken } = req.body
+      if (refreshToken == null) {
+        res.status(400).json({
+          message: 'Refresh token is required'
+        })
+      }
+
+      const newAccessToken = await this.userService.refreshToken(refreshToken)
+      res.status(200).json({
+        token: newAccessToken
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  verifyUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, code } = req.body
+      await this.userService.verifyUser(email, code)
+      res.status(200).json({
+        message: 'User verified successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  requestPasswordReset = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body
+      await this.userService.handlePasswordResetRequest(email)
+
+      res.status(200).json({
+        message: 'Password reset request sent successfully'
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token, password } = req.body
+      await this.userService.resetPassword(token, password)
+
+      res.status(200).json({
+        message: 'Password reset successfully'
       })
     } catch (error) {
       this.handleError(error, res)

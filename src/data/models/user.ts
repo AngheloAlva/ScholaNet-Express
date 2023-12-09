@@ -9,11 +9,17 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    unique: true
+    unique: true,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
   },
   role: {
     type: String,
-    enum: ['guardian', 'teacher', 'admin']
+    enum: ['guardian', 'teacher', 'admin'],
+    default: 'guardian'
   },
   students: [{
     type: Schema.Types.ObjectId,
@@ -23,7 +29,14 @@ const userSchema = new Schema({
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
-  }
+  },
+  verificationCode: String,
+  emailVefiried: {
+    type: Boolean,
+    default: false
+  },
+  resetPasswordToken: String,
+  refreshToken: String
 })
 
 export const UserModel = mongoose.model('User', userSchema)
