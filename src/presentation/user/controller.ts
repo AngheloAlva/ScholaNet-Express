@@ -103,9 +103,27 @@ export class UserController {
   loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, password } = req.body
-      const token = await this.userService.loginUser({ email, password })
+      const { token, refreshToken } = await this.userService.loginUser({ email, password })
 
-      res.status(200).json({ token })
+      res.status(200).json({ token, refreshToken })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  refreshToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { refreshToken } = req.body
+      if (refreshToken == null) {
+        res.status(400).json({
+          message: 'Refresh token is required'
+        })
+      }
+
+      const newAccessToken = await this.userService.refreshToken(refreshToken)
+      res.status(200).json({
+        token: newAccessToken
+      })
     } catch (error) {
       this.handleError(error, res)
     }

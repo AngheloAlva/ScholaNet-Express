@@ -122,10 +122,36 @@ export class UserService {
       const validPassword = await bcrypt.compare(password, user.password)
       if (!validPassword) throw CustomError.badRequest('Invalid password')
 
-      const token = jwt.sign({ userId: user._id, role: user.role }, envs.TOKEN_SECRET)
-      return token
+      const token = jwt.sign(
+        { userId: user._id, role: user.role },
+        envs.TOKEN_SECRET,
+        { expiresIn: '30m' }
+      )
+
+      const refreshToken = jwt.sign(
+        { userId: user._id, role: user.role },
+        envs.REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
+      )
+
+      user.refreshToken = refreshToken
+      await user.save()
+
+      return { token, refreshToken }
     } catch (error) {
       throw CustomError.internalServerError(`Error logging in user: ${error as string}`)
+    }
+  }
+
+  async refreshToken (refreshToken: string): Promise<any> {
+    try {
+      const decode = jwt.verify(refreshToken, envs.REFRESH_TOKEN_SECRET) as jwt.JwtPayload
+      const user = await UserModel.findOne({ refreshToken })
+      if (user == null) throw CustomError.notFound('User not found')
+
+      return jwt.sign({ userId: decode.userId, role: decode.role }, envs.TOKEN_SECRET, { expiresIn: '30m' })
+    } catch (error) {
+      throw CustomError.internalServerError(`Error refreshing token: ${error as string}`)
     }
   }
 

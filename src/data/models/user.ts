@@ -35,7 +35,8 @@ const userSchema = new Schema({
     type: Boolean,
     default: false
   },
-  resetPasswordToken: String
+  resetPasswordToken: String,
+  refreshToken: String
 })
 
 export const UserModel = mongoose.model('User', userSchema)

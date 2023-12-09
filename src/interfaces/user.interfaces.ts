@@ -2,6 +2,7 @@ import { type ObjectId } from 'mongoose'
 
 export interface User {
   save: () => unknown
+  _id: ObjectId
   name: string
   lastName: string
   rut: string

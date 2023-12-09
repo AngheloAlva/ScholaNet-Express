@@ -48,6 +48,10 @@ export class UserRoutes {
       body('password').isString().notEmpty().withMessage('Password is required'),
       validate
     ], controller.resetPassword)
+    router.post('/user/refresh-token', [
+      body('refreshToken').isString().notEmpty().withMessage('Refresh token is required'),
+      validate
+    ], controller.refreshToken)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),
