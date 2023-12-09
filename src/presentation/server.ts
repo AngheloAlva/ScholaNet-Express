@@ -1,5 +1,7 @@
 import express from 'express'
+import cors from 'cors'
 import type { Router } from 'express'
+import { envs } from '../config/envs'
 
 interface Options {
   port: number
@@ -21,6 +23,7 @@ export class Server {
   }
 
   private configure (): void {
+    this.app.use(cors({ origin: envs.CLIENT_URL }))
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
 

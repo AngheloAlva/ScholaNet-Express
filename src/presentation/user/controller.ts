@@ -22,14 +22,13 @@ export class UserController {
 
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { name, lastName, rut, email, role, password } = req.body
+      const { name, lastName, rut, email, password } = req.body
       const newUser = await this.userService.createUser({
         name,
         lastName,
         rut,
         email,
-        password,
-        role
+        password
       })
       res.status(201).json(newUser)
     } catch (error) {

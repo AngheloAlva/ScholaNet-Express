@@ -26,7 +26,6 @@ export interface CreateUser {
   rut: string
   email: string
   password: string
-  role: string
 }
 
 export interface UpdateUser {
