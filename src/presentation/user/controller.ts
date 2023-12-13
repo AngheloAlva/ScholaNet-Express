@@ -164,15 +164,4 @@ export class UserController {
       this.handleError(error, res)
     }
   }
-
-  checkUserStatus = async (req: Request, res: Response): Promise<void> => {
-    const { email } = req.params
-
-    try {
-      const { exist, verified } = await this.userService.checkUserStatus(email)
-      res.status(200).json({ exist, verified })
-    } catch (error) {
-      this.handleError(error, res)
-    }
-  }
 }

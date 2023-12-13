@@ -17,13 +17,13 @@ export class UserService {
     name, lastName, rut, email, password
   }: CreateUser): Promise<any> {
     try {
-      const existingUser = await UserModel.findOne({ email, state: 'active' })
+      const existingUser = await UserModel.findOne({ email })
       if ((existingUser != null) && !existingUser?.emailVefiried) {
         await UserModel.deleteOne({ email })
       }
 
       const userByRut = await UserModel.findOne({ rut })
-      if (userByRut != null) throw CustomError.badRequest('User with this rut already exists')
+      if ((userByRut != null) && userByRut.emailVefiried) throw CustomError.badRequest('User with this rut already exists')
 
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(password, salt)
@@ -219,17 +219,6 @@ export class UserService {
       await user.save()
     } catch (error) {
       throw CustomError.internalServerError(`Error resetting password: ${error as string}`)
-    }
-  }
-
-  async checkUserStatus (email: string): Promise<{ exist: boolean, verified?: boolean }> {
-    try {
-      const user = await UserModel.findOne({ email })
-      if (user == null) return { exist: false }
-
-      return { exist: true, verified: user.emailVefiried }
-    } catch (error) {
-      throw CustomError.internalServerError(`Error checking user status: ${error as string}`)
     }
   }
 }
