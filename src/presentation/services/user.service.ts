@@ -17,15 +17,16 @@ export class UserService {
     name, lastName, rut, email, password
   }: CreateUser): Promise<any> {
     try {
-      const userExist = await UserModel.findOne({ rut })
-
-      if (userExist != null) {
-        throw CustomError.badRequest('User already exists')
+      const existingUser = await UserModel.findOne({ email, state: 'active' })
+      if ((existingUser != null) && !existingUser?.emailVefiried) {
+        await UserModel.deleteOne({ email })
       }
+
+      const userByRut = await UserModel.findOne({ rut })
+      if (userByRut != null) throw CustomError.badRequest('User with this rut already exists')
 
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(password, salt)
-
       const verificationCode = generateVerificationCode()
 
       const newUser = new UserModel({
@@ -37,6 +38,7 @@ export class UserService {
         verificationCode,
         emailVefiried: false
       })
+
       await newUser.save()
 
       const subject = 'Verify your email'
@@ -156,7 +158,7 @@ export class UserService {
     }
   }
 
-  async verifyUser (email: string, code: string): Promise<void> {
+  async verifyUser (email: string, code: string): Promise<any> {
     try {
       const user = await UserModel.findOne({ email })
       if (user == null) throw CustomError.notFound('User not found')
@@ -165,6 +167,20 @@ export class UserService {
 
       user.emailVefiried = true
       await user.save()
+
+      const token = jwt.sign(
+        { userId: user._id, role: user.role },
+        envs.TOKEN_SECRET,
+        { expiresIn: '30m' }
+      )
+
+      const refreshToken = jwt.sign(
+        { userId: user._id, role: user.role },
+        envs.REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
+      )
+
+      return { token, refreshToken }
     } catch (error) {
       throw CustomError.internalServerError(`Error verifying user: ${error as string}`)
     }
@@ -203,6 +219,17 @@ export class UserService {
       await user.save()
     } catch (error) {
       throw CustomError.internalServerError(`Error resetting password: ${error as string}`)
+    }
+  }
+
+  async checkUserStatus (email: string): Promise<{ exist: boolean, verified?: boolean }> {
+    try {
+      const user = await UserModel.findOne({ email })
+      if (user == null) return { exist: false }
+
+      return { exist: true, verified: user.emailVefiried }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error checking user status: ${error as string}`)
     }
   }
 }

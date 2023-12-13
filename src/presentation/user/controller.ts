@@ -131,10 +131,9 @@ export class UserController {
   verifyUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, code } = req.body
-      await this.userService.verifyUser(email, code)
-      res.status(200).json({
-        message: 'User verified successfully'
-      })
+      const { token, refreshToken } = await this.userService.verifyUser(email, code)
+
+      res.status(200).json({ token, refreshToken })
     } catch (error) {
       this.handleError(error, res)
     }
@@ -161,6 +160,17 @@ export class UserController {
       res.status(200).json({
         message: 'Password reset successfully'
       })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  checkUserStatus = async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.params
+
+    try {
+      const { exist, verified } = await this.userService.checkUserStatus(email)
+      res.status(200).json({ exist, verified })
     } catch (error) {
       this.handleError(error, res)
     }
