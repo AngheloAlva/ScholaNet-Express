@@ -221,4 +221,19 @@ export class UserService {
       throw CustomError.internalServerError(`Error resetting password: ${error as string}`)
     }
   }
+
+  async verifyToken (toke: string): Promise<void> {
+    try {
+      jwt.verify(toke, envs.TOKEN_SECRET, (error, decoded) => {
+        if (error != null) throw CustomError.badRequest('Invalid token')
+
+        return {
+          valid: true,
+          userId: (decoded as jwt.JwtPayload)?.userId
+        }
+      })
+    } catch (error) {
+      throw CustomError.internalServerError(`Error verifying token: ${error as string}`)
+    }
+  }
 }

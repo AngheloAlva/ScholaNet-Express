@@ -164,4 +164,16 @@ export class UserController {
       this.handleError(error, res)
     }
   }
+
+  verifyToken = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { token } = req.body
+      const isValid = await this.userService.verifyToken(token)
+      res.status(200).json({
+        isValid
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }
