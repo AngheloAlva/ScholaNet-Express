@@ -196,7 +196,7 @@ export class UserService {
       user.resetPasswordToken = resetToken
       await user.save()
 
-      const resetLink = `${envs.CLIENT_URL}/reset-password/${resetToken}`
+      const resetLink = `${envs.CLIENT_URL}/auth/forgot-password?token=${resetToken}`
       const subject = 'Reset your password'
       const text = `Click on this link to reset your password: ${resetLink}`
       const html = `<p>Click on this link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`

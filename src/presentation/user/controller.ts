@@ -145,7 +145,7 @@ export class UserController {
       await this.userService.handlePasswordResetRequest(email)
 
       res.status(200).json({
-        message: 'Password reset request sent successfully'
+        message: 'Password reset request sent successfully. Check your email'
       })
     } catch (error) {
       this.handleError(error, res)
