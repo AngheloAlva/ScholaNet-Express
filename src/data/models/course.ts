@@ -7,16 +7,12 @@ const courseSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Program'
   },
-  students: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Student'
-  }],
-  teacher: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  },
   image: String,
-  href: String
+  href: String,
+  section: {
+    type: String,
+    required: true
+  }
 })
 
 export const CourseModel = mongoose.model('Course', courseSchema)
