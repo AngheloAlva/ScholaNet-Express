@@ -1,25 +1,22 @@
-import { CourseModel, ProgramModel, MaterialModel } from '../../data/models/index'
+import { CourseModel, ProgramModel, MaterialModel, EvaluationModel } from '../../data/models/index'
 import { verifyCourseExists, verifyProgramExists } from '../../helpers/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { AssignmentModel } from '../../data/models/assignment'
-import { verifyTeacherExists } from '../../helpers/userHelpers'
 
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
-import type { CreateCourse } from '../../interfaces/course.interfaces'
+import type { CreateCourse, UpdateCourse } from '../../interfaces/course.interfaces'
 import type { ObjectId } from 'mongoose'
 
 export class CourseService {
   async createCourse ({
-    title, description, program, teacher, image, href
+    title, description, program, image, href
   }: CreateCourse): Promise<any> {
     try {
       const courseExist = await CourseModel.findOne({ title })
       if (courseExist != null) throw CustomError.badRequest('Course already exists')
 
-      await verifyTeacherExists(teacher)
       await verifyProgramExists(program)
 
-      const course = new CourseModel({ title, description, program, teacher, image, href })
+      const course = new CourseModel({ title, description, program, image, href })
       await course.save()
 
       await ProgramModel.findByIdAndUpdate(program, {
@@ -60,24 +57,14 @@ export class CourseService {
     }
   }
 
-  async updateCourse ({ id, title, description, program, teacher, image, href }: CreateCourse): Promise<any> {
+  async updateCourse ({ id, title, description, image, href }: UpdateCourse): Promise<any> {
     try {
-      const courseDb = await verifyCourseExists(id as ObjectId)
+      const courseDb = await verifyCourseExists(id)
 
       if (title != null) courseDb.title = title
       if (description != null) courseDb.description = description
       if (image != null) courseDb.image = image
       if (href != null) courseDb.href = href
-
-      if (program != null) {
-        await verifyProgramExists(program)
-        courseDb.program = program as any
-      }
-
-      if (teacher != null) {
-        await verifyTeacherExists(teacher)
-        courseDb.teacher = teacher as any
-      }
 
       await courseDb.save()
 
@@ -104,16 +91,16 @@ export class CourseService {
     }
   }
 
-  async getAssignmentsByCourse (courseId: ObjectId): Promise<any> {
+  async getEvaluationsByCourse (courseId: ObjectId): Promise<any> {
     try {
       await verifyCourseExists(courseId)
 
-      const assignments = await AssignmentModel.find({ course: courseId })
-      if (assignments == null) throw CustomError.notFound('Assignments not found')
+      const evaluations = await EvaluationModel.find({ course: courseId })
+      if (evaluations == null) throw CustomError.notFound('Evaluations not found')
 
-      return assignments
+      return evaluations
     } catch (error) {
-      throw CustomError.internalServerError(`Error getting assignments: ${error as string}`)
+      throw CustomError.internalServerError(`Error getting evaluations: ${error as string}`)
     }
   }
 

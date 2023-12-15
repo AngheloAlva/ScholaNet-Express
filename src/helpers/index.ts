@@ -1,12 +1,12 @@
-import { verifyAssignmentExists } from './assignmentHelpers'
-import { verifyCourseExists } from './courseHelpers'
-import { verifyProgramExists } from './programHelpers'
 import { verifyGuardianExist, verifyTeacherExists } from './userHelpers'
+import { verifyEvaluationExists } from './evaluationHelpers'
+import { verifyProgramExists } from './programHelpers'
+import { verifyCourseExists } from './courseHelpers'
 
 export {
-  verifyAssignmentExists,
-  verifyCourseExists,
-  verifyProgramExists,
+  verifyEvaluationExists,
   verifyTeacherExists,
-  verifyGuardianExist
+  verifyProgramExists,
+  verifyGuardianExist,
+  verifyCourseExists
 }

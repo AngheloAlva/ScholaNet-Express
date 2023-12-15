@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { InscriptionRoutes } from './inscriptions/routes'
 import { CourseRoutes } from './course/routes'
-import { AssignmentRoutes } from './assignments/routes'
+import { EvaluationRoutes } from './evaluation/routes'
 import { MaterialRoutes } from './material/routes'
 import { ProgramRoutes } from './program/routes'
 import { StudentRoutes } from './student/routes'
@@ -15,7 +15,7 @@ export class AppRoutes {
     router.use('/api', UserRoutes.routes)
     router.use('/api', ProgramRoutes.routes)
     router.use('/api', CourseRoutes.routes)
-    router.use('/api', AssignmentRoutes.routes)
+    router.use('/api', EvaluationRoutes.routes)
     router.use('/api', MaterialRoutes.routes)
     router.use('/api', StudentRoutes.routes)
     router.use('/api', InscriptionRoutes.routes)

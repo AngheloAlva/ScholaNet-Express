@@ -5,18 +5,24 @@ export interface Course {
   title: string
   description: string
   program: ObjectId
-  students: ObjectId[]
-  teacher: ObjectId
   image: string
   href: string
+  section: string
 }
 
 export interface CreateCourse {
-  id?: ObjectId
   title: string
   description: string
   program: ObjectId
-  teacher: ObjectId
+  image: string
+  href: string
+  section: string
+}
+
+export interface UpdateCourse {
+  id: ObjectId
+  title: string
+  description: string
   image: string
   href: string
 }

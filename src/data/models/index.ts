@@ -1,17 +1,21 @@
-import { AssignmentModel } from './assignment'
-import { CourseModel } from './course'
+import { BehaviorReportModel } from './behaviorReport'
 import { InscriptionModel } from './inscription'
+import { EvaluationModel } from './evaluation'
+import { AttendanceModel } from './attendance'
 import { MaterialModel } from './material'
-import { ProgramModel } from './program'
 import { StudentModel } from './student'
+import { ProgramModel } from './program'
+import { CourseModel } from './course'
 import { UserModel } from './user'
 
 export {
-  AssignmentModel,
-  CourseModel,
+  BehaviorReportModel,
   InscriptionModel,
+  EvaluationModel,
+  AttendanceModel,
   MaterialModel,
-  ProgramModel,
   StudentModel,
+  ProgramModel,
+  CourseModel,
   UserModel
 }

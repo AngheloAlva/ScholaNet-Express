@@ -2,41 +2,41 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 import { Router } from 'express'
-import { AssignmentService } from '../services/assignments.service'
-import { AssignmentController } from './controller'
 import { body, param } from 'express-validator'
+
+import { EvaluationService } from '../services/evaluation.service'
 import { validate } from '../../middlewares/validation.middleware'
 import { idValidation } from '../validations/idValidation'
+import { EvaluationController } from './controller'
 
-export class AssignmentRoutes {
+export class EvaluationRoutes {
   static get routes (): Router {
     const router = Router()
-    const service = new AssignmentService()
-    const controller = new AssignmentController(service)
+    const service = new EvaluationService()
+    const controller = new EvaluationController(service)
 
-    router.get('/assignments', controller.getAssignments)
-    router.get('/assignment/:id', idValidation, controller.getAssignmentsById)
+    router.get('/evaluations', controller.getEvaluations)
+    router.get('/evaluation/:id', idValidation, controller.getEvaluationById)
 
-    router.post('/assignment', [
+    router.post('/evaluation', [
       body('title').isString().notEmpty().withMessage('Title is required'),
-      body('type').isIn(['task', 'evaluation']).notEmpty().withMessage('Type is required, must be one of [task, evaluation]'),
+      body('type').isString().isIn(['paper', 'online', 'presentation', 'project']).withMessage('Type is required, and must be one of: paper, online, presentation, project'),
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
       body('course').isMongoId().notEmpty().withMessage('Course is required'),
-      body('score').isNumeric().withMessage('Score must be a number').default(0),
+      body('questions').isArray().notEmpty().withMessage('Questions is required'),
       validate
-    ], controller.createAssignments)
+    ], controller.createEvaluation)
 
-    router.put('/assignment/:id', [
+    router.put('/evaluation/:id', [
       param('id').isMongoId().optional().withMessage('Id is required'),
       body('title').isString().optional().withMessage('Title is required'),
       body('description').isString().optional().withMessage('Description is required'),
       body('dueDate').isString().optional().withMessage('Due date is required'),
-      body('score').isNumeric().optional().withMessage('Score must be a number'),
       validate
-    ], controller.updateAssignment)
+    ], controller.updateEvaluation)
 
-    router.delete('/assignment/:id', idValidation, controller.deleteAssignment)
+    router.delete('/evaluation/:id', idValidation, controller.deleteEvaluation)
 
     return router
   }

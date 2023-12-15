@@ -16,10 +16,10 @@ export class CourseRoutes {
 
     router.get('/courses', controller.getCourses)
     router.get('/course/:id', idValidation, controller.getCourseById)
-    router.get('/course/assignments/:courseId', [
+    router.get('/course/evaluations/:courseId', [
       param('courseId').isMongoId().notEmpty().withMessage('Id is required'),
       validate
-    ], controller.getAssignmentsByCourse)
+    ], controller.getEvaluationsByCourse)
     router.get('/course/materials/:courseId', [
       param('courseId').isMongoId().notEmpty().withMessage('Id is required'),
       validate
@@ -29,9 +29,9 @@ export class CourseRoutes {
       body('title').isString().notEmpty().withMessage('Title is required'),
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('program').isMongoId().notEmpty().withMessage('Program is required'),
-      body('teacher').isMongoId().notEmpty().withMessage('Teacher is required'),
       body('image').isString().notEmpty().withMessage('Image is required'),
       body('href').isString().notEmpty().withMessage('Href is required'),
+      body('section').isString().notEmpty().withMessage('Section is required'),
       validate
     ], controller.createCourse)
 

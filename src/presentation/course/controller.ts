@@ -2,8 +2,8 @@
 
 import { CustomError } from '../../domain/errors/custom.error'
 
-import { type CourseService } from '../services/courses.service'
-import { type Request, type Response } from 'express'
+import type { CourseService } from '../services/courses.service'
+import type { Request, Response } from 'express'
 import type { ObjectId } from 'mongoose'
 
 export class CourseController {
@@ -22,14 +22,14 @@ export class CourseController {
 
   createCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, program, teacher, image, href } = req.body
+      const { title, description, program, image, href, section } = req.body
       const newCourse = await this.courseService.createCourse({
         title,
         description,
         program,
-        teacher,
         image,
-        href
+        href,
+        section
       })
       res.status(201).json(newCourse)
     } catch (error) {
@@ -84,11 +84,11 @@ export class CourseController {
     }
   }
 
-  getAssignmentsByCourse = async (req: Request, res: Response): Promise<void> => {
+  getEvaluationsByCourse = async (req: Request, res: Response): Promise<void> => {
     try {
       const { courseId } = req.params
-      const assignments = await this.courseService.getAssignmentsByCourse(courseId as unknown as ObjectId)
-      res.status(200).json(assignments)
+      const evaluations = await this.courseService.getEvaluationsByCourse(courseId as unknown as ObjectId)
+      res.status(200).json(evaluations)
     } catch (error) {
       this.handleError(error, res)
     }
