@@ -3,9 +3,9 @@ import mongoose, { Schema } from 'mongoose'
 const evaluationSchema = new Schema({
   title: String,
   description: String,
-  course: {
+  courseInstance: {
     type: Schema.Types.ObjectId,
-    ref: 'Course'
+    ref: 'CourseInstance'
   },
   dueDate: Date,
   type: {

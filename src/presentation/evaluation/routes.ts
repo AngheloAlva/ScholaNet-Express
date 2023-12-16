@@ -23,7 +23,7 @@ export class EvaluationRoutes {
       body('type').isString().isIn(['paper', 'online', 'presentation', 'project']).withMessage('Type is required, and must be one of: paper, online, presentation, project'),
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
-      body('course').isMongoId().notEmpty().withMessage('Course is required'),
+      body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
       body('questions').isArray().notEmpty().withMessage('Questions is required'),
       validate
     ], controller.createEvaluation)

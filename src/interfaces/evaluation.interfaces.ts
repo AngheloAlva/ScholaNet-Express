@@ -5,7 +5,7 @@ export interface CreateEvaluation {
   title: string
   description: string
   dueDate: Date
-  course: ObjectId
+  courseInstance: ObjectId
   type: string
   questions: Question[]
 }

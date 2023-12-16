@@ -8,16 +8,17 @@ import type { ObjectId } from 'mongoose'
 
 export class EvaluationService {
   async createEvaluation ({
-    title, description, dueDate, course, type, questions
+    title, description, dueDate, courseInstance, type, questions
   }: CreateEvaluation): Promise<any> {
     try {
-      await verifyCourseExists(course)
+      const courseInstanceExist = await verifyCourseExists(courseInstance)
+      if (courseInstanceExist == null) throw CustomError.badRequest('Course Instance does not exist')
 
       const newEvaluation = new EvaluationModel({
         title,
         description,
         dueDate,
-        course,
+        courseInstance,
         type,
         questions
       })
@@ -36,7 +37,7 @@ export class EvaluationService {
         EvaluationModel.find()
           .skip((page - 1) * limit)
           .limit(limit)
-          .populate('course')
+          .populate('courseInstance')
       ])
 
       return {
@@ -50,7 +51,10 @@ export class EvaluationService {
 
   async getEvaluationsById (id: ObjectId): Promise<any> {
     try {
-      const evaluation = await verifyEvaluationExists(id)
+      const evaluation = await EvaluationModel.findById(id)
+        .populate('courseInstance')
+
+      if (evaluation == null) throw CustomError.notFound('Evaluation not found')
 
       return evaluation
     } catch (error) {

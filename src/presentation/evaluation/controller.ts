@@ -21,12 +21,12 @@ export class EvaluationController {
 
   createEvaluation = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, dueDate, course, type, questions } = req.body
+      const { title, description, dueDate, courseInstance, type, questions } = req.body
       const newEvaluation = await this.evaluationService.createEvaluation({
         title,
         description,
         dueDate,
-        course,
+        courseInstance,
         type,
         questions
       })

@@ -1,16 +1,16 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
+import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
+import { CourseInstanceModel, UserModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyUserExists } from '../../helpers/userHelpers'
-import { UserModel } from '../../data/models/index'
+import { sendEmail } from '../../utils/sendGridMailer'
+import { envs } from '../../config/envs'
 
 import type { UpdateUser, CreateUser, LoginUser } from '../../interfaces/user.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
-import { envs } from '../../config/envs'
-import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
-import { sendEmail } from '../../utils/sendGridMailer'
 
 export class UserService {
   async createUser ({
@@ -234,6 +234,22 @@ export class UserService {
       })
     } catch (error) {
       throw CustomError.internalServerError(`Error verifying token: ${error as string}`)
+    }
+  }
+
+  async getCoursesInstancesByTeacher (teacherId: ObjectId): Promise<any> {
+    try {
+      const teacher = await UserModel.findById(teacherId)
+      if (teacher == null) throw CustomError.notFound('Teacher not found')
+
+      const coursesInstances = await CourseInstanceModel.find({ teacher: teacherId })
+        .populate('course')
+        .populate('teacher')
+        .populate('semester')
+
+      return coursesInstances
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting courses instances: ${error as string}`)
     }
   }
 }

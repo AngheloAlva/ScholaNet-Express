@@ -176,4 +176,14 @@ export class UserController {
       this.handleError(error, res)
     }
   }
+
+  getCoursesInstancesByTeacher = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { teacherId } = req.params
+      const coursesInstances = await this.userService.getCoursesInstancesByTeacher(teacherId as unknown as ObjectId)
+      res.status(200).json(coursesInstances)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }
