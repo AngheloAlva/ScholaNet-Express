@@ -14,6 +14,7 @@ import { StudentRoutes } from './student/routes'
 import { ProgramRoutes } from './program/routes'
 import { CourseRoutes } from './course/routes'
 import { UserRoutes } from './user/routes'
+import { AuthRoutes } from './auth/routes'
 
 export class AppRoutes {
   static get routes (): Router {
@@ -31,6 +32,7 @@ export class AppRoutes {
     router.use('/api', StudentRoutes.routes)
     router.use('/api', CourseRoutes.routes)
     router.use('/api', UserRoutes.routes)
+    router.use('/api', AuthRoutes.routes)
 
     return router
   }

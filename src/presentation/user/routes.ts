@@ -33,33 +33,6 @@ export class UserRoutes {
       body('password').isString().notEmpty().withMessage('Password is required'),
       validate
     ], controller.createUser)
-    router.post('/user/login', [
-      body('email').isEmail().withMessage('Email is required'),
-      body('password').isString().notEmpty().withMessage('Password is required'),
-      validate
-    ], controller.loginUser)
-    router.post('/user/verify-email', [
-      body('email').isEmail().withMessage('Email is required'),
-      body('code').isString().notEmpty().withMessage('Verification code is required'),
-      validate
-    ], controller.verifyUser)
-    router.post('/user/request-password-reset', [
-      body('email').isEmail().withMessage('Email is required'),
-      validate
-    ], controller.requestPasswordReset)
-    router.post('/user/reset-password', [
-      body('token').isString().notEmpty().withMessage('Token is required'),
-      body('password').isString().notEmpty().withMessage('Password is required'),
-      validate
-    ], controller.resetPassword)
-    router.post('/user/refresh-token', [
-      body('refreshToken').isString().notEmpty().withMessage('Refresh token is required'),
-      validate
-    ], controller.refreshToken)
-    router.post('/user/verifytoken', [
-      body('token').isString().notEmpty().withMessage('Token is required'),
-      validate
-    ], controller.verifyToken)
 
     router.put('/user/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),
