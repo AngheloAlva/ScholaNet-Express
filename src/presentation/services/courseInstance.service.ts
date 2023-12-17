@@ -1,9 +1,10 @@
-import { CourseInstanceModel, SemesterModel } from '../../data/models'
+import { CourseInstanceModel, EvaluationModel, MaterialModel, SemesterModel } from '../../data/models'
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyCourseExists, verifyTeacherExists } from '../../helpers'
 
 import type { CreateCourseInstance, UpdateCourseInstance } from '../../interfaces/courseInstance.interface'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { ObjectId } from 'mongoose'
 
 export class CourseInstanceService {
   async createCourseInstance ({
@@ -91,6 +92,34 @@ export class CourseInstanceService {
       return courseInstance
     } catch (error) {
       throw CustomError.internalServerError(`Error adding student to course instance: ${error as string}`)
+    }
+  }
+
+  async getEvaluationsByCourseInstance (id: ObjectId): Promise<any> {
+    try {
+      const courseInstance = await CourseInstanceModel.findById(id)
+      if (courseInstance == null) throw CustomError.notFound('Course instance not found')
+
+      const evaluations = await EvaluationModel.find({ courseInstance: id })
+      if (evaluations == null) throw CustomError.notFound('Evaluations not found')
+
+      return evaluations
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting evaluations: ${error as string}`)
+    }
+  }
+
+  async getMaterialsByCourseInstance (id: ObjectId): Promise<any> {
+    try {
+      const courseInstance = await CourseInstanceModel.findById(id)
+      if (courseInstance == null) throw CustomError.notFound('Course instance not found')
+
+      const materials = await MaterialModel.find({ courseInstance: id })
+      if (materials == null) throw CustomError.notFound('Materials not found')
+
+      return materials
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting materials: ${error as string}`)
     }
   }
 }

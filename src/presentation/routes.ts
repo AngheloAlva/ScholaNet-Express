@@ -2,6 +2,8 @@
 
 import { Router } from 'express'
 
+import { BehaviorReportRoutes } from './behaviorReport/routes'
+import { CourseInstanceRoutes } from './courseInstance/routes'
 import { InscriptionRoutes } from './inscriptions/routes'
 import { EvaluationRoutes } from './evaluation/routes'
 import { AttendanceRoutes } from './attendance/routes'
@@ -23,6 +25,8 @@ export class AppRoutes {
     router.use('/api', StudentRoutes.routes)
     router.use('/api', InscriptionRoutes.routes)
     router.use('/api', AttendanceRoutes.routes)
+    router.use('/api', BehaviorReportRoutes.routes)
+    router.use('/api', CourseInstanceRoutes.routes)
 
     return router
   }

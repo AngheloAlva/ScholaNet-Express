@@ -1,7 +1,8 @@
 import { CustomError } from '../../domain/errors/custom.error'
 
 import type { CourseInstanceService } from '../services/courseInstance.service'
-import type { Response } from 'express'
+import type { Request, Response } from 'express'
+import type { ObjectId } from 'mongoose'
 
 export class CourseInstanceController {
   constructor (
@@ -83,6 +84,28 @@ export class CourseInstanceController {
       )
 
       res.status(200).json(updatedCourseInstance)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getEvaluationsByCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const evaluations = await this.courseInstanceService.getEvaluationsByCourseInstance(id as unknown as ObjectId)
+
+      res.status(200).json(evaluations)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getMaterialsByCourse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const materials = await this.courseInstanceService.getMaterialsByCourseInstance(id as unknown as ObjectId)
+
+      res.status(200).json(materials)
     } catch (error) {
       this.handleError(error, res)
     }

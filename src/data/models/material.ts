@@ -8,9 +8,9 @@ const materialSchema = new Schema({
     enum: ['pdf', 'link', 'file']
   },
   url: String,
-  course: {
+  courseInstance: {
     type: Schema.Types.ObjectId,
-    ref: 'Course'
+    ref: 'CourseInstance'
   }
 })
 

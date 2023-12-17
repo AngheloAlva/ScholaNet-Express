@@ -1,4 +1,4 @@
-import { CourseModel, MaterialModel } from '../../data/models/index'
+import { CourseInstanceModel, MaterialModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
 
 import type { CreateMaterial, UpdateMaterial } from '../../interfaces/material.interfaces'
@@ -7,17 +7,18 @@ import type { ObjectId } from 'mongoose'
 
 export class MaterialService {
   async createMaterial ({
-    title, description, type, url, course
+    title, description, type, url, courseInstance
   }: CreateMaterial): Promise<any> {
     try {
-      await CourseModel.findById(course)
+      await CourseInstanceModel.findById(courseInstance)
+      if (courseInstance == null) throw CustomError.notFound('Course instance not found')
 
       const material = new MaterialModel({
         title,
         description,
         type,
         url,
-        course
+        courseInstance
       })
       await material.save()
 
@@ -34,7 +35,7 @@ export class MaterialService {
         MaterialModel.find()
           .skip((page - 1) * limit)
           .limit(limit)
-          .populate('course')
+          .populate('courseInstance')
       ])
       return {
         total,

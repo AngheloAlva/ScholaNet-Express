@@ -1,4 +1,4 @@
-import { CourseModel, ProgramModel, MaterialModel, EvaluationModel } from '../../data/models/index'
+import { CourseModel, ProgramModel } from '../../data/models/index'
 import { verifyCourseExists, verifyProgramExists } from '../../helpers/index'
 import { CustomError } from '../../domain/errors/custom.error'
 
@@ -88,32 +88,6 @@ export class CourseService {
       return courseDb
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting course: ${error as string}`)
-    }
-  }
-
-  async getEvaluationsByCourse (courseId: ObjectId): Promise<any> {
-    try {
-      await verifyCourseExists(courseId)
-
-      const evaluations = await EvaluationModel.find({ course: courseId })
-      if (evaluations == null) throw CustomError.notFound('Evaluations not found')
-
-      return evaluations
-    } catch (error) {
-      throw CustomError.internalServerError(`Error getting evaluations: ${error as string}`)
-    }
-  }
-
-  async getMaterialsByCourse (courseId: ObjectId): Promise<any> {
-    try {
-      await verifyCourseExists(courseId)
-
-      const materials = await MaterialModel.find({ course: courseId })
-      if (materials == null) throw CustomError.notFound('Materials not found')
-
-      return materials
-    } catch (error) {
-      throw CustomError.internalServerError(`Error getting materials: ${error as string}`)
     }
   }
 }

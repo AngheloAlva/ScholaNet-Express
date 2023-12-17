@@ -22,7 +22,7 @@ export class MaterialRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('type').isString().isIn(['pdf', 'link', 'file']).withMessage('Type is required, must be one of [pdf, link, file]'),
       body('url').isURL().notEmpty().withMessage('Url is required'),
-      body('course').isMongoId().notEmpty().withMessage('Course is required'),
+      body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
       validate
     ], controller.createMaterial)
 

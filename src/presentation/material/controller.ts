@@ -22,13 +22,13 @@ export class MaterialController {
 
   createMaterial = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, type, url, course } = req.body
+      const { title, description, type, url, courseInstance } = req.body
       const newMaterial = await this.materialService.createMaterial({
         title,
         description,
         type,
         url,
-        course
+        courseInstance
       })
       res.status(201).json(newMaterial)
     } catch (error) {
@@ -39,11 +39,11 @@ export class MaterialController {
   getMaterials = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const materials = await this.materialService.getMaterials({
+      const { total, materials } = await this.materialService.getMaterials({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(materials)
+      res.status(200).json({ total, materials })
     } catch (error) {
       this.handleError(error, res)
     }

@@ -16,14 +16,6 @@ export class CourseRoutes {
 
     router.get('/courses', controller.getCourses)
     router.get('/course/:id', idValidation, controller.getCourseById)
-    router.get('/course/evaluations/:courseId', [
-      param('courseId').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.getEvaluationsByCourse)
-    router.get('/course/materials/:courseId', [
-      param('courseId').isMongoId().notEmpty().withMessage('Id is required'),
-      validate
-    ], controller.getMaterialsByCourse)
 
     router.post('/course', [
       body('title').isString().notEmpty().withMessage('Title is required'),

@@ -5,7 +5,7 @@ export interface CreateMaterial {
   description: string
   type: 'pdf' | 'link' | 'file'
   url: string
-  course: string
+  courseInstance: ObjectId
 }
 
 export interface UpdateMaterial {
