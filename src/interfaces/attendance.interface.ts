@@ -4,6 +4,6 @@ export interface Attendance {
   date: Date
   person: string
   onModel: string
-  course: ObjectId
+  courseInstance: ObjectId
   status: 'present' | 'absent' | 'late' | 'excused'
 }

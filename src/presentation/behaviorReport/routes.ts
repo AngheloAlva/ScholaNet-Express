@@ -14,10 +14,10 @@ export class BehaviorReportRoutes {
     const service = new BehaviorReportService()
     const controller = new BehaviorReportController(service)
 
-    router.get('/behaviorReports', controller.getBehaviorReports)
-    router.get('/behaviorReport/:id', idValidation, controller.getBehaviorReportById)
+    router.get('/behavior-reports', controller.getBehaviorReports)
+    router.get('/behavior-report/:id', idValidation, controller.getBehaviorReportById)
 
-    router.post('/behaviorReport', [
+    router.post('/behavior-report', [
       body('student').isMongoId().notEmpty().withMessage('Student is required'),
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('severity').isString().isIn(['mild', 'moderate', 'severe']).notEmpty().withMessage('Severity is required'),
@@ -25,7 +25,7 @@ export class BehaviorReportRoutes {
       validate
     ], controller.createBehaviorReport)
 
-    router.put('/behaviorReport/:id', [
+    router.put('/behavior-report/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id is required'),
       body('description').isString().optional(),
       body('severity').isString().isIn(['mild', 'moderate', 'severe']).optional(),

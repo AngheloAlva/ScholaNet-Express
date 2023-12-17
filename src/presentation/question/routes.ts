@@ -15,7 +15,7 @@ export class QuestionRoutes {
     const controller = new QuestionController(service)
 
     router.get('/question/:id', idValidation, controller.getQuestionById)
-    router.get('/questions/:evaluation', [
+    router.get('/questions/evaluation/:evaluation', [
       param('evaluation').isMongoId().notEmpty().withMessage('Evaluation is required'),
       validate
     ], controller.getQuestionsByEvaluation)

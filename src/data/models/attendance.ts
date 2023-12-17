@@ -10,9 +10,9 @@ const attendanceSchema = new Schema({
     type: String,
     enum: ['Student', 'Teacher']
   },
-  course: {
+  courseInstance: {
     type: Schema.Types.ObjectId,
-    ref: 'Course'
+    ref: 'CourseInstance'
   },
   status: {
     type: String,

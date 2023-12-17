@@ -6,6 +6,18 @@ import type { CreateEvaluation, UpdateEvaluation } from '../../interfaces/evalua
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
 
+export interface Submission {
+  student: ObjectId
+  answers: Array<{
+    answer: string[]
+    score: number
+    feedback: string
+    question: ObjectId
+  }>
+  score?: number
+  feedback?: string
+}
+
 export class EvaluationService {
   async createEvaluation ({
     title, description, dueDate, courseInstance, type, questions
@@ -89,6 +101,20 @@ export class EvaluationService {
       await evaluation.deleteOne()
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting Evaluation: ${error as string}`)
+    }
+  }
+
+  async addSubmission (id: ObjectId, submission: Submission): Promise<any> {
+    try {
+      const evaluation = await verifyEvaluationExists(id)
+
+      evaluation.submissions.push(submission)
+
+      await evaluation.save()
+
+      return evaluation
+    } catch (error) {
+      throw CustomError.internalServerError(`Error adding submission: ${error as string}`)
     }
   }
 }

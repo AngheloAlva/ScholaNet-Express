@@ -4,6 +4,13 @@ import { EvaluationModel } from '../data/models'
 import type { Question } from '../interfaces/question.interface'
 import type { ObjectId } from 'mongoose'
 
+interface Answer {
+  question: ObjectId
+  answer: string[]
+  score?: number
+  feedback?: string
+}
+
 interface Evaluation {
   deleteOne: () => unknown
   save: () => unknown
@@ -15,14 +22,9 @@ interface Evaluation {
   questions: Question[]
   submissions: Array<{
     student: ObjectId
-    answers: Array<{
-      answers: string[]
-      score: number
-      feedback: string
-      question: ObjectId
-    }>
-    score: number
-    feedback: string
+    answers: Answer[]
+    score?: number
+    feedback?: string
   }>
 }
 

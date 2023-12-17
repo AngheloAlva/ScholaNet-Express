@@ -1,4 +1,4 @@
-import { AttendanceModel, StudentModel, UserModel } from '../../data/models'
+import { AttendanceModel, CourseInstanceModel, StudentModel, UserModel } from '../../data/models'
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyCourseExists } from '../../helpers'
 
@@ -7,16 +7,22 @@ import type { ObjectId } from 'mongoose'
 
 export class AttendanceService {
   async createAttendance ({
-    date, person, onModel, course, status
+    date, person, onModel, courseInstance, status
   }: Attendance): Promise<any> {
     try {
-      await verifyCourseExists(course)
+      const courseInstanceExist = await CourseInstanceModel.findById(courseInstance)
+      if (courseInstanceExist == null) throw CustomError.badRequest('Course instance does not exist')
+
+      const student = await StudentModel.findById(person)
+      const teacher = await UserModel.findById(person).where('role').equals('teacher')
+
+      if ((student == null) && (teacher == null)) throw CustomError.badRequest('Person does not exist')
 
       const attendance = new AttendanceModel({
         date,
         person,
         onModel,
-        course,
+        courseInstance,
         status
       })
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { CustomError } from '../../domain/errors/custom.error'
 
-import type { EvaluationService } from '../services/evaluation.service'
+import type { EvaluationService, Submission } from '../services/evaluation.service'
 import type { Request, Response } from 'express'
 import type { ObjectId } from 'mongoose'
 
@@ -79,6 +79,22 @@ export class EvaluationController {
       res.status(204).json({
         message: 'Evaluation deleted'
       })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  addSubmission = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { submission } = req.body
+
+      if ((submission as Submission).student == null) throw CustomError.badRequest('Student is required')
+      if ((submission as Submission).answers.length === 0) throw CustomError.badRequest('Answers is required')
+
+      const evaluation = await this.evaluationService.addSubmission(id as unknown as ObjectId, submission)
+
+      res.status(200).json(evaluation)
     } catch (error) {
       this.handleError(error, res)
     }

@@ -36,7 +36,7 @@ export class AuthRoutes {
       body('refreshToken').isString().notEmpty().withMessage('Refresh token is required'),
       validate
     ], controller.refreshToken)
-    router.post('/auth/verifytoken', [
+    router.post('/auth/verify-token', [
       body('token').isString().notEmpty().withMessage('Token is required'),
       validate
     ], controller.verifyToken)

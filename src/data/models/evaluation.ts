@@ -22,15 +22,15 @@ const evaluationSchema = new Schema({
       ref: 'User'
     },
     answers: [{
-      answers: [String],
-      score: Number,
-      feedback: String,
       question: {
         type: Schema.Types.ObjectId,
         ref: 'Question'
-      }
+      },
+      answer: [String],
+      score: Number,
+      feedback: String
     }],
-    score: Number,
+    totalScore: Number,
     feedback: String
   }]
 })

@@ -21,10 +21,10 @@ export class AttendanceController {
 
   createAttendance = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { date, course, onModel, person, status }: Attendance = req.body
+      const { date, courseInstance, onModel, person, status }: Attendance = req.body
       const newAttendance = await this.attendanceService.createAttendance({
         date,
-        course,
+        courseInstance,
         onModel,
         person,
         status
