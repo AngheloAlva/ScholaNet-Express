@@ -2,7 +2,7 @@ import { CourseInstanceModel, EvaluationModel, MaterialModel, SemesterModel } fr
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyCourseExists, verifyTeacherExists } from '../../helpers'
 
-import type { CreateCourseInstance, UpdateCourseInstance } from '../../interfaces/courseInstance.interface'
+import type { CreateCourseInstance, UpdateCourseInstance } from '../../interfaces/courseInstance.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
 

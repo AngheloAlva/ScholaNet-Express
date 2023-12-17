@@ -1,7 +1,7 @@
 import { CustomError } from '../../domain/errors/custom.error'
 import { BehaviorReportModel, StudentModel } from '../../data/models'
 
-import type { CreateBehaviorReport, UpdateBehaviorReport } from '../../interfaces/behaviorReport.interface'
+import type { CreateBehaviorReport, UpdateBehaviorReport } from '../../interfaces/behaviorReport.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 
 export class BehaviorReportService {
