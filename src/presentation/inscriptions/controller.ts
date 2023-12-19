@@ -42,11 +42,14 @@ export class InscriptionController {
   getInscriptions = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const inscriptions = await this.inscriptionService.getInscriptions({
+      const { total, inscriptions } = await this.inscriptionService.getInscriptions({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(inscriptions)
+      res.status(200).json({
+        total,
+        inscriptions
+      })
     } catch (error) {
       this.handleError(error, res)
     }

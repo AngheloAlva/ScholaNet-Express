@@ -36,11 +36,14 @@ export class ProgramController {
   getPrograms = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const programs = await this.programServise.getPrograms({
+      const { total, programs } = await this.programServise.getPrograms({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(programs)
+      res.status(200).json({
+        total,
+        programs
+      })
     } catch (error) {
       this.handleError(error, res)
     }

@@ -23,11 +23,14 @@ export class StudentController {
   getStudents = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const students = await this.studentService.getStudents({
+      const { total, students } = await this.studentService.getStudents({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(students)
+      res.status(200).json({
+        total,
+        students
+      })
     } catch (error) {
       this.handleError(error, res)
     }

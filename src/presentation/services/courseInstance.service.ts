@@ -27,9 +27,9 @@ export class CourseInstanceService {
     }
   }
 
-  async getCoursesInstances ({ page, limit }: PaginationDto): Promise<any> {
+  async getCourseInstances ({ page, limit }: PaginationDto): Promise<any> {
     try {
-      const [total, coursesInstances] = await Promise.all([
+      const [total, courseInstances] = await Promise.all([
         CourseInstanceModel.countDocuments(),
         CourseInstanceModel.find()
           .skip((page - 1) * limit)
@@ -41,7 +41,7 @@ export class CourseInstanceService {
 
       return {
         total,
-        coursesInstances
+        courseInstances
       }
     } catch (error) {
       throw CustomError.internalServerError(`Error getting courses instances: ${error as string}`)

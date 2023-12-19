@@ -35,14 +35,17 @@ export class CourseInstanceController {
     }
   }
 
-  getCoursesInstances = async (req: any, res: Response): Promise<void> => {
+  getCourseInstances = async (req: any, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const coursesInstances = await this.courseInstanceService.getCoursesInstances({
+      const { total, courseInstances } = await this.courseInstanceService.getCourseInstances({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(coursesInstances)
+      res.status(200).json({
+        total,
+        courseInstances
+      })
     } catch (error) {
       this.handleError(error, res)
     }

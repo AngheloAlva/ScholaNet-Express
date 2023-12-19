@@ -16,7 +16,7 @@ export class EvaluationRoutes {
     const controller = new EvaluationController(service)
 
     router.get('/evaluations', controller.getEvaluations)
-    router.get('/evaluations/:id', idValidation, controller.getEvaluationById)
+    router.get('/evaluation/:id', idValidation, controller.getEvaluationById)
 
     router.post('/evaluation', [
       body('title').isString().notEmpty().withMessage('Title is required'),
@@ -28,15 +28,7 @@ export class EvaluationRoutes {
       body('questions').isArray().notEmpty().withMessage('Questions is required'),
       validate
     ], controller.createEvaluation)
-
-    router.put('/evaluation/:id', [
-      param('id').isMongoId().optional().withMessage('Id is required'),
-      body('title').isString().optional().withMessage('Title is required'),
-      body('description').isString().optional().withMessage('Description is required'),
-      body('dueDate').isString().optional().withMessage('Due date is required'),
-      validate
-    ], controller.updateEvaluation)
-    router.put('/evaluation/submission/:id', [
+    router.post('/evaluation/submission/:id', [
       param('id').isMongoId().withMessage('Invalid evaluation ID'),
       body('submission.student').isMongoId().notEmpty().withMessage('Student ID is required'),
       body('submission.answers').isArray().notEmpty().withMessage('Answers are required'),
@@ -48,6 +40,15 @@ export class EvaluationRoutes {
       body('submission.feedback').optional().isString(),
       validate
     ], controller.addSubmission)
+
+    router.put('/evaluation/:id', [
+      param('id').isMongoId().optional().withMessage('Id is required'),
+      body('title').isString().optional().withMessage('Title is required'),
+      body('description').isString().optional().withMessage('Description is required'),
+      body('dueDate').isString().optional().withMessage('Due date is required'),
+      body('questions').isArray().optional().withMessage('Questions is required'),
+      validate
+    ], controller.updateEvaluation)
 
     router.delete('/evaluation/:id', idValidation, controller.deleteEvaluation)
 

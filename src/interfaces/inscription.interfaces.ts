@@ -4,7 +4,7 @@ export interface Inscription {
   _id: ObjectId
   student: ObjectId
   program: ObjectId
-  status: string
+  status: 'enrolled' | 'completed' | 'cancelled'
   enrollmentDate: Date
 }
 

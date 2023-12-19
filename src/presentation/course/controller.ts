@@ -40,11 +40,14 @@ export class CourseController {
   getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const courses = await this.courseService.getCourses({
+      const { total, courses } = await this.courseService.getCourses({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(courses)
+      res.status(200).json({
+        total,
+        courses
+      })
     } catch (error) {
       this.handleError(error, res)
     }

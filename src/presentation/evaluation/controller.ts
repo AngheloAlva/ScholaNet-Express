@@ -39,11 +39,14 @@ export class EvaluationController {
   getEvaluations = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const evaluation = await this.evaluationService.getEvaluations({
+      const { total, evaluations } = await this.evaluationService.getEvaluations({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(evaluation)
+      res.status(200).json({
+        total,
+        evaluations
+      })
     } catch (error) {
       this.handleError(error, res)
     }

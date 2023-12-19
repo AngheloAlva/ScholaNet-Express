@@ -23,7 +23,7 @@ export class AttendanceRoutes {
       body('date').isDate().notEmpty().withMessage('Date is required'),
       body('courseInstance').isMongoId().notEmpty().withMessage('Course ID is required'),
       body('onModel').isString().isIn(['Student', 'Teacher']).notEmpty().withMessage('OnModel is required'),
-      body('person').isMongoId().notEmpty().withMessage('Person ID is required'),
+      body('person').isMongoId().notEmpty().withMessage('Person is required'),
       body('status').isString().isIn(['present', 'absent', 'late', 'excused']).notEmpty().withMessage('Status is required')
     ], controller.createAttendance)
 

@@ -115,9 +115,9 @@ export class AuthService {
     }
   }
 
-  async verifyToken (toke: string): Promise<void> {
+  async verifyToken (token: string): Promise<void> {
     try {
-      jwt.verify(toke, envs.TOKEN_SECRET, (error, decoded) => {
+      jwt.verify(token, envs.TOKEN_SECRET, (error, decoded) => {
         if (error != null) throw CustomError.badRequest('Invalid token')
 
         return {

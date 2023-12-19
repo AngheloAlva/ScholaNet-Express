@@ -14,15 +14,12 @@ export class CourseInstanceRoutes {
     const service = new CourseInstanceService()
     const controller = new CourseInstanceController(service)
 
-    router.get('/courses-instances', [
+    router.get('/course-instances', [
       query('page').optional().isInt({ min: 1 }),
       query('limit').optional().isInt({ min: 1 }),
       validate
-    ], controller.getCoursesInstances)
-    router.get('/course-instance/:id', [
-      param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
-      validate
-    ], controller.getCourseInstanceById)
+    ], controller.getCourseInstances)
+    router.get('/course-instance/:id', idValidation, controller.getCourseInstanceById)
     router.get('/course-instance/evaluations/:id', idValidation, controller.getEvaluationsByCourse)
     router.get('/course-instance/materials/:id', idValidation, controller.getMaterialsByCourse)
 
