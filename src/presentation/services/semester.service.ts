@@ -57,6 +57,17 @@ export class SemesterService {
     }
   }
 
+  async getSemesterById (semesterId: string): Promise<any> {
+    try {
+      const semester = await SemesterModel.findById(semesterId)
+      if (semester == null) throw CustomError.internalServerError('Semester not found')
+
+      return semester
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting semester: ${error as string}`)
+    }
+  }
+
   async updateSemester ({
     semesterId, name, startDate, endDate
   }: UpdateSemester): Promise<any> {

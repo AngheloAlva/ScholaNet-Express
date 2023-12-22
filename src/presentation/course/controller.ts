@@ -22,14 +22,13 @@ export class CourseController {
 
   createCourse = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, program, image, href, section } = req.body
+      const { title, description, program, image, href } = req.body
       const newCourse = await this.courseService.createCourse({
         title,
         description,
         program,
         image,
-        href,
-        section
+        href
       })
       res.status(201).json(newCourse)
     } catch (error) {

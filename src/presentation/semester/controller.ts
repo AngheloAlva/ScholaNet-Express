@@ -49,6 +49,17 @@ export class SemesterController {
     }
   }
 
+  getSemesterById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const semester = await this.semesterService.getSemesterById(id)
+
+      res.status(200).json(semester)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
   updateSemester = async (req: Request, res: Response): Promise<void> => {
     try {
       const data = req.body

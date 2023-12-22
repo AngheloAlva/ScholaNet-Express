@@ -39,11 +39,14 @@ export class UserController {
   getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const users = await this.userService.getUsers({
+      const { total, users } = await this.userService.getUsers({
         page: Number(page),
         limit: Number(limit)
       })
-      res.status(200).json(users)
+      res.status(200).json({
+        total,
+        users
+      })
     } catch (error) {
       this.handleError(error, res)
     }

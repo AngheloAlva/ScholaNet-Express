@@ -7,7 +7,6 @@ export interface Course {
   program: ObjectId
   image: string
   href: string
-  section: string
 }
 
 export interface CreateCourse {
@@ -16,7 +15,6 @@ export interface CreateCourse {
   program: ObjectId
   image: string
   href: string
-  section: string
 }
 
 export interface UpdateCourse {

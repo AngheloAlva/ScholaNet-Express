@@ -36,7 +36,7 @@ export class CourseService {
         CourseModel.find()
           .skip((page - 1) * limit)
           .limit(limit)
-          .populate('teacher')
+          .populate('program')
       ])
       return {
         total,
@@ -49,7 +49,7 @@ export class CourseService {
 
   async getCourseById (id: ObjectId): Promise<any> {
     try {
-      const course = await verifyCourseExists(id)
+      const course = await CourseModel.findById(id).populate('program')
 
       return course
     } catch (error) {

@@ -6,6 +6,7 @@ import { SemesterService } from '../services/semester.service'
 import { SemesterController } from './controller'
 import { body, param } from 'express-validator'
 import { validate } from '../../middlewares/validation.middleware'
+import { idValidation } from '../validations/idValidation'
 
 export class SemesterRoutes {
   static get routes (): Router {
@@ -14,11 +15,12 @@ export class SemesterRoutes {
     const controller = new SemesterController(service)
 
     router.get('/semesters', controller.getSemesters)
+    router.get('/semester/:id', idValidation, controller.getSemesterById)
 
     router.post('/semester', [
       body('name').isString().notEmpty().withMessage('Name is required'),
-      body('startDate').isDate().notEmpty().withMessage('Start date is required'),
-      body('endDate').isDate().notEmpty().withMessage('End date is required'),
+      body('startDate').isString().notEmpty().withMessage('Start date is required'),
+      body('endDate').isString().notEmpty().withMessage('End date is required'),
       validate
     ], controller.createSemester)
 

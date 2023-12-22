@@ -8,11 +8,7 @@ const courseSchema = new Schema({
     ref: 'Program'
   },
   image: String,
-  href: String,
-  section: {
-    type: String,
-    required: true
-  }
+  href: String
 })
 
 export const CourseModel = mongoose.model('Course', courseSchema)
