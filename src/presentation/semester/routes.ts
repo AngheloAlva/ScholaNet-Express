@@ -27,8 +27,8 @@ export class SemesterRoutes {
     router.put('/semester/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
       body('name').optional().isString().withMessage('Name must be a string'),
-      body('startDate').optional().isDate().withMessage('Start date must be a date'),
-      body('endDate').optional().isDate().withMessage('End date must be a date'),
+      body('startDate').optional().isString().withMessage('Start date must be a date'),
+      body('endDate').optional().isString().withMessage('End date must be a date'),
       validate
     ], controller.updateSemester)
 
