@@ -25,7 +25,8 @@ const courseInstanceSchema = new Schema({
       enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
     },
     startTime: String,
-    endTime: String
+    endTime: String,
+    duration: Number
   }]
 })
 

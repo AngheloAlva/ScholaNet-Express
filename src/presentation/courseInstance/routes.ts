@@ -28,14 +28,19 @@ export class CourseInstanceRoutes {
       body('classroom').notEmpty().withMessage('Classroom is required'),
       body('course').isMongoId().notEmpty().withMessage('Course is required'),
       body('schedule').isArray().notEmpty().withMessage('Schedule is required'),
+      body('schedule.*.day').isIn(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']).withMessage('Day must be a valid day of the week'),
+      body('schedule.*.startTime').isString().notEmpty().withMessage('Start time is required'),
+      body('schedule.*.endTime').isString().notEmpty().withMessage('End time is required'),
+      body('schedule.*.duration').isInt({ min: 1 }).notEmpty().withMessage('Duration is required'),
       body('semester').isMongoId().notEmpty().withMessage('Semester is required'),
-      body('teacher').isMongoId().notEmpty().withMessage('Teacher is required')
-    ], validate, controller.createCourseInstance)
+      body('teacher').isMongoId().notEmpty().withMessage('Teacher is required'),
+      validate
+    ], controller.createCourseInstance)
     router.post('/course-instance/add-student/:courseInstanceId', [
       param('courseInstanceId').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
       body('studentId').isMongoId().notEmpty().withMessage('Student id is required'),
       validate
-    ], validate, controller.addStudentToCourseInstance)
+    ], controller.addStudentToCourseInstance)
 
     router.put('/course-instance/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),

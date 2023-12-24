@@ -11,6 +11,7 @@ export interface CourseInstance {
     day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
     startTime: string
     endTime: string
+    duration: number
   }>
 }
 
@@ -24,6 +25,7 @@ export interface CreateCourseInstance {
     day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
     startTime: string
     endTime: string
+    duration: number
   }>
 }
 
@@ -35,5 +37,6 @@ export interface UpdateCourseInstance {
     day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
     startTime: string
     endTime: string
+    duration: number
   }>
 }
