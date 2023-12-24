@@ -24,6 +24,7 @@ export class UserRoutes {
       param('teacherId').isMongoId().notEmpty().withMessage('Id is required'),
       validate
     ], controller.getCoursesInstancesByTeacher)
+    router.get('/users/teachers', controller.getTeachers)
 
     router.post('/user', [
       body('name').isString().notEmpty().withMessage('Name is required'),

@@ -87,6 +87,15 @@ export class UserService {
     }
   }
 
+  async getTeachers (): Promise<any> {
+    try {
+      const teachers = await UserModel.find({ role: 'teacher' })
+      return teachers
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting teachers: ${error as string}`)
+    }
+  }
+
   async updateUser ({ id, name, lastName, email }: UpdateUser): Promise<any> {
     try {
       const userExist = await verifyUserExists(id)
