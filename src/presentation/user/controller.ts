@@ -74,8 +74,11 @@ export class UserController {
 
   getTeachers = async (req: Request, res: Response): Promise<void> => {
     try {
-      const teachers = await this.userService.getTeachers()
-      res.status(200).json(teachers)
+      const { total, teachers } = await this.userService.getTeachers()
+      res.status(200).json({
+        total,
+        teachers
+      })
     } catch (error) {
       this.handleError(error, res)
     }

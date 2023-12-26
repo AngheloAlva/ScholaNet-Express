@@ -44,9 +44,13 @@ export class CourseInstanceRoutes {
 
     router.put('/course-instance/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
-      body('classroom').optional().notEmpty().withMessage('Classroom is required'),
-      body('schedule').optional().isArray().withMessage('Schedule must be an array'),
-      body('teacher').optional().isMongoId().withMessage('Teacher must be a valid MongoId'),
+      body('classroom').optional().notEmpty(),
+      body('schedule').optional().isArray(),
+      body('schedule.*.day').optional().isIn(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']),
+      body('schedule.*.startTime').optional().isString(),
+      body('schedule.*.duration').optional().isInt({ min: 1 }),
+      body('schedule.*.endTime').optional().isString(),
+      body('teacher').optional().isMongoId(),
       validate
     ], controller.updateCourseInstance)
 

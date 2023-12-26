@@ -89,8 +89,14 @@ export class UserService {
 
   async getTeachers (): Promise<any> {
     try {
-      const teachers = await UserModel.find({ role: 'teacher' })
-      return teachers
+      const [total, teachers] = await Promise.all([
+        UserModel.countDocuments({ role: 'teacher' }),
+        UserModel.find({ role: 'teacher' })
+      ])
+      return {
+        total,
+        teachers
+      }
     } catch (error) {
       throw CustomError.internalServerError(`Error getting teachers: ${error as string}`)
     }
