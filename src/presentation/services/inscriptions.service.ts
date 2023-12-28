@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
-import { CourseModel, InscriptionModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
+import { InscriptionModel } from '../../data/models/index'
+import { verifyGuardianExist } from '../../helpers'
 import { StudentService } from './student.service'
+import bcrypt from 'bcrypt'
 
 import type { CreateInscriptionProps } from '../../interfaces/inscription.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -14,6 +16,11 @@ export class InscriptionService {
     name, lastName, dateOfBirth, password, rut, program, guardian
   }: CreateInscriptionProps): Promise<unknown> {
     try {
+      await verifyGuardianExist(guardian)
+
+      const salt = await bcrypt.genSalt(10)
+      password = await bcrypt.hash(password, salt)
+
       const studentService = new StudentService()
       const studentId = await studentService.createStudent({
         name,
@@ -30,11 +37,6 @@ export class InscriptionService {
         program
       })
       await inscription.save()
-
-      await CourseModel.updateMany(
-        { program },
-        { $push: { students: studentId } }
-      )
 
       return inscription
     } catch (error) {

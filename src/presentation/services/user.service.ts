@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt'
 
 import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
-import { CourseInstanceModel, UserModel } from '../../data/models/index'
+import { CourseInstanceModel, StudentModel, UserModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { verifyUserExists } from '../../helpers/userHelpers'
+import { verifyGuardianExist, verifyUserExists } from '../../helpers/userHelpers'
 import { sendEmail } from '../../utils/sendGridMailer'
 
 import type { UpdateUser, CreateUser } from '../../interfaces/user.interfaces'
@@ -99,6 +99,18 @@ export class UserService {
       }
     } catch (error) {
       throw CustomError.internalServerError(`Error getting teachers: ${error as string}`)
+    }
+  }
+
+  async getStudentsByGuardian (guardianId: ObjectId): Promise<any> {
+    try {
+      const guardian = await verifyGuardianExist(guardianId)
+      const students = await StudentModel.find({ guardian: guardian._id })
+        .populate('program')
+
+      return students
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting students: ${error as string}`)
     }
   }
 

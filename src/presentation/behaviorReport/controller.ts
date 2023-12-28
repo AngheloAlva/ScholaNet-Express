@@ -59,6 +59,17 @@ export class BehaviorReportController {
     }
   }
 
+  getBehaviorReportsByStudent = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { studentId } = req.params
+      const behaviorReports = await this.behaviorReportService.getBehaviorReportsByStudent(studentId)
+
+      res.status(200).json(behaviorReports)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
   updateBehaviorReport = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id, description, severity, resolved } = req.body

@@ -25,6 +25,7 @@ export class UserRoutes {
       validate
     ], controller.getCoursesInstancesByTeacher)
     router.get('/users/teachers', controller.getTeachers)
+    router.get('/user/:id/students', idValidation, controller.getStudentsByGuardian)
 
     router.post('/user', [
       body('name').isString().notEmpty().withMessage('Name is required'),

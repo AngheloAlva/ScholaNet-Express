@@ -58,6 +58,19 @@ export class BehaviorReportService {
     }
   }
 
+  async getBehaviorReportsByStudent (studentId: string): Promise<any> {
+    try {
+      const student = await StudentModel.findById(studentId)
+      if (student == null) throw CustomError.notFound('Student not found')
+
+      const behaviorReports = await BehaviorReportModel.find({ student: studentId })
+
+      return behaviorReports
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting behavior reports: ${error as string}`)
+    }
+  }
+
   async updateBehaviorReport ({
     id, description, severity, resolved
   }: UpdateBehaviorReport): Promise<any> {

@@ -84,6 +84,17 @@ export class UserController {
     }
   }
 
+  getStudentsByGuardian = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const students = await this.userService.getStudentsByGuardian(id as unknown as ObjectId)
+
+      res.status(200).json(students)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
   updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params

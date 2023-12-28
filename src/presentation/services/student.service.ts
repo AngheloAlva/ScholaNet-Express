@@ -23,7 +23,7 @@ export class StudentService {
       const salt = await bcrypt.genSalt(10)
       password = await bcrypt.hash(password, salt)
 
-      const student = new StudentModel({ name, lastName, dateOfBirth, password, rut, program })
+      const student = new StudentModel({ name, lastName, dateOfBirth, password, rut, program, guardian })
       await student.save()
 
       guardianExist.students.push(student.id)
