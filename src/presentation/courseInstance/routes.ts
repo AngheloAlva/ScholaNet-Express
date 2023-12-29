@@ -22,6 +22,11 @@ export class CourseInstanceRoutes {
     router.get('/course-instance/:id', idValidation, controller.getCourseInstanceById)
     router.get('/course-instance/evaluations/:id', idValidation, controller.getEvaluationsByCourse)
     router.get('/course-instance/materials/:id', idValidation, controller.getMaterialsByCourse)
+    router.get('/course-instance/:courseInstanceId/student/:studentId', [
+      param('courseInstanceId').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
+      param('studentId').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
+      validate
+    ], controller.getAverageGradeByStudent)
 
     router.post('/course-instance', [
       body('academicYear').notEmpty().withMessage('Academic year is required'),

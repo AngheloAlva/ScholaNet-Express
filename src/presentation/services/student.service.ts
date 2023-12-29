@@ -54,6 +54,13 @@ export class StudentService {
   async getStudentById (id: string): Promise<any> {
     try {
       const student = await StudentModel.findById(id)
+        .populate('program')
+        .populate('guardian')
+        .populate('attendances')
+        .populate('evaluations')
+        .populate('behaviorReports')
+        .populate('courseInstances')
+
       if (student == null) throw CustomError.notFound('Student not found')
 
       return student

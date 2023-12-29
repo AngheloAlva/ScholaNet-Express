@@ -49,8 +49,8 @@ export class AttendanceController {
 
   getAttendanceByPerson = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { person } = req.params
-      const attendances = await this.attendanceService.getAttendanceByPerson(person as unknown as ObjectId)
+      const { personId } = req.params
+      const attendances = await this.attendanceService.getAttendanceByPerson(personId as unknown as ObjectId)
 
       res.status(200).json(attendances)
     } catch (error) {

@@ -1,7 +1,7 @@
 import { CustomError } from '../domain/errors/custom.error'
 import { EvaluationModel } from '../data/models'
 
-import type { Question } from '../interfaces/question.interface'
+import type { Question } from '../interfaces/question.interfaces'
 import type { ObjectId } from 'mongoose'
 
 interface Answer {

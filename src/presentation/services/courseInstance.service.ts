@@ -143,4 +143,30 @@ export class CourseInstanceService {
       throw CustomError.internalServerError(`Error getting materials: ${error as string}`)
     }
   }
+
+  async getAverageGradeByStudent (courseInstanceId: ObjectId, studentId: ObjectId): Promise<any> {
+    try {
+      const evaluations = await EvaluationModel.find({ courseInstance: courseInstanceId })
+      if (evaluations == null) throw CustomError.notFound('Evaluations not found')
+
+      const studentSubmissions = evaluations.map(evaluation =>
+        evaluation.submissions.find(submission =>
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          submission?.student?.toString() === studentId.toString()
+        )
+      )
+
+      const validSubmissions = studentSubmissions.filter(
+        submission => submission?.totalScore != null
+      )
+      if (validSubmissions.length === 0) return { message: 'No submissions found' }
+
+      const averageGrade = validSubmissions.reduce((acc, submission) =>
+        acc + (submission?.totalScore ?? 0), 0) / validSubmissions.length
+
+      return { averageGrade }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting average grade: ${error as string}`)
+    }
+  }
 }

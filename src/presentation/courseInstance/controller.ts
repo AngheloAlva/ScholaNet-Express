@@ -113,4 +113,18 @@ export class CourseInstanceController {
       this.handleError(error, res)
     }
   }
+
+  getAverageGradeByStudent = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { studentId, courseInstanceId } = req.params
+      const averageGrade = await this.courseInstanceService.getAverageGradeByStudent(
+        studentId as unknown as ObjectId,
+        courseInstanceId as unknown as ObjectId
+      )
+
+      res.status(200).json(averageGrade)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

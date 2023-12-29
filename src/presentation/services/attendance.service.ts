@@ -58,10 +58,10 @@ export class AttendanceService {
 
   async getAttendanceByPerson (person: ObjectId): Promise<any> {
     try {
-      const personExist = await StudentModel.findById(person)
+      const studentExist = await StudentModel.findById(person)
       const teacherExist = await UserModel.findById(person).where('role').equals('teacher')
 
-      if ((personExist == null) && (teacherExist == null)) throw CustomError.badRequest('Person does not exist')
+      if ((studentExist == null) && (teacherExist == null)) throw CustomError.badRequest('Person does not exist')
 
       const attendances = await AttendanceModel.find({ person })
         .populate('person')
