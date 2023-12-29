@@ -1,10 +1,9 @@
-import bcrypt from 'bcrypt'
-
-import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
 import { CourseInstanceModel, StudentModel, UserModel } from '../../data/models/index'
-import { CustomError } from '../../domain/errors/custom.error'
+import { generateVerificationCode } from '../../helpers/verificationCodeGenerator'
 import { verifyGuardianExist, verifyUserExists } from '../../helpers/userHelpers'
+import { CustomError } from '../../domain/errors/custom.error'
 import { sendEmail } from '../../utils/sendGridMailer'
+import bcrypt from 'bcrypt'
 
 import type { UpdateUser, CreateUser } from '../../interfaces/user.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -116,15 +115,22 @@ export class UserService {
 
   async updateUser ({ id, name, lastName, email }: UpdateUser): Promise<any> {
     try {
-      const userExist = await verifyUserExists(id)
+      const updateData: {
+        name?: string
+        lastName?: string
+        email?: string
+      } = {}
 
-      if (name != null) userExist.name = name
-      if (lastName != null) userExist.lastName = lastName
-      if (email != null) userExist.email = email
+      if (name != null) updateData.name = name
+      if (lastName != null) updateData.lastName = lastName
+      if (email != null) updateData.email = email
 
-      await userExist.save()
+      const updatedUser = await UserModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+      if (updatedUser == null) throw CustomError.notFound('User not found')
 
-      return userExist
+      return updatedUser
     } catch (error) {
       throw CustomError.internalServerError(`Error updating user: ${error as string}`)
     }

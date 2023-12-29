@@ -27,6 +27,14 @@ const courseInstanceSchema = new Schema({
     startTime: String,
     endTime: String,
     duration: Number
+  }],
+  attendances: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Attendance'
+  }],
+  evaluations: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Evaluation'
   }]
 })
 

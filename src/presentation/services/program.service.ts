@@ -1,6 +1,5 @@
 import { CustomError } from '../../domain/errors/custom.error'
 import { ProgramModel } from '../../data/models/index'
-import { verifyProgramExists } from '../../helpers'
 
 import type { CreateProgram, UpdateProgram } from '../../interfaces/program.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -54,15 +53,20 @@ export class ProgramService {
 
   async updateProgram ({ id, name, description, courses }: UpdateProgram): Promise<any> {
     try {
-      const program = await verifyProgramExists(id)
+      const updateData: {
+        name?: string
+        description?: string
+        courses?: ObjectId[]
+      } = {}
 
-      if (name != null) program.name = name
-      if (description != null) program.description = description
-      if (courses != null) program.courses = courses
+      if (name != null) updateData.name = name
+      if (description != null) updateData.description = description
+      if (courses != null) updateData.courses = courses
 
-      await program.save()
+      const updatedProgram = await ProgramModel.findByIdAndUpdate(id, updateData, { new: true })
+      if (updatedProgram == null) throw CustomError.notFound('Program not found')
 
-      return program
+      return updatedProgram
     } catch (error) {
       throw CustomError.internalServerError(`Error updating program: ${error as string}`)
     }

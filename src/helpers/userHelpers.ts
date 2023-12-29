@@ -23,3 +23,10 @@ export async function verifyUserExists (userId: ObjectId): Promise<User> {
 
   return userExist as unknown as User
 }
+
+export async function verifyUserExistByRole (userId: ObjectId, role: string): Promise<User> {
+  const userExist = await UserModel.findById(userId).where({ role })
+  if (userExist == null) throw CustomError.notFound(`${role} not found`)
+
+  return userExist as unknown as User
+}

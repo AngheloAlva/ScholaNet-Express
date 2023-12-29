@@ -72,8 +72,11 @@ export class SemesterService {
     semesterId, name, startDate, endDate
   }: UpdateSemester): Promise<any> {
     try {
-      const semester = await SemesterModel.findById(semesterId)
-      if (semester == null) throw CustomError.internalServerError('Semester not found')
+      const updateData: {
+        name?: string
+        startDate?: Date
+        endDate?: Date
+      } = {}
 
       if ((startDate != null) && (endDate != null)) {
         const startDateObj = new Date(startDate)
@@ -84,15 +87,18 @@ export class SemesterService {
           throw CustomError.internalServerError('Start and end dates must be in the same year')
         }
 
-        semester.startDate = startDate
-        semester.endDate = endDate
+        updateData.startDate = startDate
+        updateData.endDate = endDate
       }
 
-      if (name != null) semester.name = name
+      if (name != null) updateData.name = name
 
-      await semester.save()
+      const updatedSemester = await SemesterModel.findByIdAndUpdate(semesterId, updateData, {
+        new: true
+      })
+      if (updatedSemester == null) throw CustomError.internalServerError('Semester not found')
 
-      return semester
+      return updatedSemester
     } catch (error) {
       throw CustomError.internalServerError(`Error updating semester: ${error as string}`)
     }

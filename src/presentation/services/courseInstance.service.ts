@@ -1,6 +1,6 @@
-import { CourseInstanceModel, EvaluationModel, MaterialModel, SemesterModel } from '../../data/models'
-import { CustomError } from '../../domain/errors/custom.error'
+import { CourseInstanceModel, CourseModel, EvaluationModel, MaterialModel, SemesterModel, StudentModel } from '../../data/models'
 import { verifyCourseExists, verifyTeacherExists } from '../../helpers'
+import { CustomError } from '../../domain/errors/custom.error'
 
 import type { CreateCourseInstance, UpdateCourseInstance } from '../../interfaces/courseInstance.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -20,6 +20,10 @@ export class CourseInstanceService {
         academicYear, classroom, course, schedule, semester, teacher
       })
       await courseInstance.save()
+
+      await CourseModel.findByIdAndUpdate(course, {
+        $push: { courseInstances: courseInstance._id }
+      })
 
       return courseInstance
     } catch (error) {
@@ -69,13 +73,26 @@ export class CourseInstanceService {
       const courseInstance = await CourseInstanceModel.findById(id)
       if (courseInstance == null) throw CustomError.badRequest('Course instance does not exist')
 
-      if (classroom != null) courseInstance.classroom = classroom
-      if (schedule != null) courseInstance.schedule = schedule
-      if (teacher != null) courseInstance.teacher = teacher as any
+      const updateData: {
+        classroom?: string
+        schedule?: Array<{
+          day: string
+          startTime: string
+          endTime: string
+          duration: number
+        }>
+        teacher?: string
+      } = {}
 
-      await courseInstance.save()
+      if (classroom != null) updateData.classroom = classroom
+      if (schedule != null) updateData.schedule = schedule
+      if (teacher != null) updateData.teacher = teacher as any
 
-      return courseInstance
+      const updatedCourseInstance = await CourseInstanceModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+
+      return updatedCourseInstance
     } catch (error) {
       throw CustomError.internalServerError(`Error updating course instance: ${error as string}`)
     }
@@ -88,6 +105,10 @@ export class CourseInstanceService {
 
       courseInstance.students.push(studentId as any)
       await courseInstance.save()
+
+      await StudentModel.findByIdAndUpdate(studentId, {
+        $push: { courseInstances: courseInstance._id }
+      })
 
       return courseInstance
     } catch (error) {

@@ -1,5 +1,5 @@
-import { CustomError } from '../../domain/errors/custom.error'
 import { BehaviorReportModel, StudentModel } from '../../data/models'
+import { CustomError } from '../../domain/errors/custom.error'
 
 import type { CreateBehaviorReport, UpdateBehaviorReport } from '../../interfaces/behaviorReport.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -18,6 +18,10 @@ export class BehaviorReportService {
         description,
         severity,
         resolved
+      })
+
+      await StudentModel.findByIdAndUpdate(student, {
+        $push: { behaviorReports: newBehaviorReport._id }
       })
 
       return newBehaviorReport
@@ -75,16 +79,20 @@ export class BehaviorReportService {
     id, description, severity, resolved
   }: UpdateBehaviorReport): Promise<any> {
     try {
-      const behaviorReport = await BehaviorReportModel.findById(id)
-      if (behaviorReport == null) throw CustomError.notFound('Behavior report not found')
+      const updateData: {
+        description?: string
+        severity?: string
+        resolved?: boolean
+      } = {}
 
-      if (description != null) behaviorReport.description = description
-      if (severity != null) behaviorReport.severity = severity
-      if (resolved != null) behaviorReport.resolved = resolved
+      if (description != null) updateData.description = description
+      if (severity != null) updateData.severity = severity
+      if (resolved != null) updateData.resolved = resolved
 
-      await behaviorReport.save()
+      const updatedBehaviorReport = await BehaviorReportModel.findByIdAndUpdate(id, updateData, { new: true })
+      if (updatedBehaviorReport == null) throw CustomError.notFound('Behavior report not found')
 
-      return behaviorReport
+      return updatedBehaviorReport
     } catch (error) {
       throw CustomError.internalServerError(`Error updating behavior report: ${error as string}`)
     }

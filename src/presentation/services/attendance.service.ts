@@ -1,8 +1,9 @@
 import { AttendanceModel, CourseInstanceModel, StudentModel, UserModel } from '../../data/models'
+import { verifyUserExistByRole } from '../../helpers/userHelpers'
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyCourseExists } from '../../helpers'
 
-import type { Attendance } from '../../interfaces/attendance.interface'
+import type { Attendance } from '../../interfaces/attendance.interfaces'
 import type { ObjectId } from 'mongoose'
 
 export class AttendanceService {
@@ -13,10 +14,7 @@ export class AttendanceService {
       const courseInstanceExist = await CourseInstanceModel.findById(courseInstance)
       if (courseInstanceExist == null) throw CustomError.badRequest('Course instance does not exist')
 
-      const student = await StudentModel.findById(person)
-      const teacher = await UserModel.findById(person).where('role').equals('teacher')
-
-      if ((student == null) && (teacher == null)) throw CustomError.badRequest('Person does not exist')
+      await verifyUserExistByRole(person, onModel)
 
       const attendance = new AttendanceModel({
         date,
@@ -27,6 +25,17 @@ export class AttendanceService {
       })
 
       await attendance.save()
+
+      if (onModel === 'Student') {
+        await StudentModel.findByIdAndUpdate(person, {
+          $push: { attendances: attendance._id }
+        })
+      } else if (onModel === 'Teacher') {
+        await UserModel.findByIdAndUpdate(person, {
+          $push: { attendances: attendance._id }
+        })
+      }
+
       return attendance
     } catch (error) {
       throw CustomError.internalServerError(`Error getting evaluations: ${error as string}`)

@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 
 import { Router } from 'express'
-
-import { BehaviorReportRoutes } from './behaviorReport/routes'
-import { CourseInstanceRoutes } from './courseInstance/routes'
-import { InscriptionRoutes } from './inscriptions/routes'
-import { EvaluationRoutes } from './evaluation/routes'
-import { AttendanceRoutes } from './attendance/routes'
-import { MaterialRoutes } from './material/routes'
-import { QuestionRoutes } from './question/routes'
-import { SemesterRoutes } from './semester/routes'
-import { StudentRoutes } from './student/routes'
-import { ProgramRoutes } from './program/routes'
-import { CourseRoutes } from './course/routes'
-import { UserRoutes } from './user/routes'
-import { AuthRoutes } from './auth/routes'
+import {
+  BehaviorReportRoutes,
+  CourseInstanceRoutes,
+  InscriptionRoutes,
+  EvaluationRoutes,
+  AttendanceRoutes,
+  QuestionRoutes,
+  ScheduleRoutes,
+  SemesterRoutes,
+  MaterialRoutes,
+  ProgramRoutes,
+  StudentRoutes,
+  CourseRoutes,
+  UserRoutes,
+  AuthRoutes
+} from './routes.exports'
 
 export class AppRoutes {
   static get routes (): Router {
@@ -28,6 +30,7 @@ export class AppRoutes {
     router.use('/api', MaterialRoutes.routes)
     router.use('/api', QuestionRoutes.routes)
     router.use('/api', SemesterRoutes.routes)
+    router.use('/api', ScheduleRoutes.routes)
     router.use('/api', ProgramRoutes.routes)
     router.use('/api', StudentRoutes.routes)
     router.use('/api', CourseRoutes.routes)

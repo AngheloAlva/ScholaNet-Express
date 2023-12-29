@@ -61,17 +61,24 @@ export class MaterialService {
     id, title, description, type, url
   }: UpdateMaterial): Promise<any> {
     try {
-      const material = await MaterialModel.findById(id)
-      if (material == null) throw CustomError.notFound('Material not found')
+      const updateData: {
+        title?: string
+        description?: string
+        type?: string
+        url?: string
+      } = {}
 
-      if (title != null) material.title = title
-      if (description != null) material.description = description
-      if (type != null) material.type = type
-      if (url != null) material.url = url
+      if (title != null) updateData.title = title
+      if (description != null) updateData.description = description
+      if (type != null) updateData.type = type
+      if (url != null) updateData.url = url
 
-      await material.save()
+      const updatedMaterial = await MaterialModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+      if (updatedMaterial == null) throw CustomError.notFound('Material not found')
 
-      return material
+      return updatedMaterial
     } catch (error) {
       throw CustomError.internalServerError(`Error updating material: ${error as string}`)
     }
@@ -79,10 +86,10 @@ export class MaterialService {
 
   async deleteMaterial (id: ObjectId): Promise<any> {
     try {
-      const material = await MaterialModel.findById(id)
+      const material = await MaterialModel.findByIdAndDelete(id)
       if (material == null) throw CustomError.notFound('Material not found')
 
-      await material.deleteOne()
+      return material
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting material: ${error as string}`)
     }

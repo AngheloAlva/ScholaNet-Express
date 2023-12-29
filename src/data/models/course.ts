@@ -8,7 +8,11 @@ const courseSchema = new Schema({
     ref: 'Program'
   },
   image: String,
-  href: String
+  href: String,
+  courseInstances: [{
+    type: Schema.Types.ObjectId,
+    ref: 'CourseInstance'
+  }]
 })
 
 export const CourseModel = mongoose.model('Course', courseSchema)

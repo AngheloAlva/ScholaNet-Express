@@ -1,7 +1,7 @@
 import { CustomError } from '../../domain/errors/custom.error'
 
 import type { AttendanceService } from '../services/attendance.service'
-import type { Attendance } from '../../interfaces/attendance.interface'
+import type { Attendance } from '../../interfaces/attendance.interfaces'
 import type { Response, Request } from 'express'
 import type { ObjectId } from 'mongoose'
 

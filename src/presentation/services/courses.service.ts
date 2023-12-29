@@ -1,9 +1,9 @@
-import { CourseModel, ProgramModel } from '../../data/models/index'
 import { verifyCourseExists, verifyProgramExists } from '../../helpers/index'
+import { CourseModel, ProgramModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
 
-import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { CreateCourse, UpdateCourse } from '../../interfaces/course.interfaces'
+import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
 
 export class CourseService {
@@ -59,16 +59,25 @@ export class CourseService {
 
   async updateCourse ({ id, title, description, image, href }: UpdateCourse): Promise<any> {
     try {
-      const courseDb = await verifyCourseExists(id)
+      await verifyCourseExists(id)
 
-      if (title != null) courseDb.title = title
-      if (description != null) courseDb.description = description
-      if (image != null) courseDb.image = image
-      if (href != null) courseDb.href = href
+      const updateData: {
+        title?: string
+        description?: string
+        image?: string
+        href?: string
+      } = {}
 
-      await courseDb.save()
+      if (title != null) updateData.title = title
+      if (description != null) updateData.description = description
+      if (image != null) updateData.image = image
+      if (href != null) updateData.href = href
 
-      return courseDb
+      const updatedCourse = await CourseModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+
+      return updatedCourse
     } catch (error) {
       throw CustomError.internalServerError(`Error updating course: ${error as string}`)
     }

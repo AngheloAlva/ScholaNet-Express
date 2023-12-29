@@ -1,8 +1,7 @@
-import bcrypt from 'bcrypt'
-
 import { verifyProgramExists, verifyGuardianExist } from '../../helpers'
 import { CustomError } from '../../domain/errors/custom.error'
 import { StudentModel } from '../../data/models/index'
+import bcrypt from 'bcrypt'
 
 import type { CreateStudent, UpdateStudent } from '../../interfaces/student.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -65,28 +64,34 @@ export class StudentService {
 
   async updateStudent ({ id, password, program, guardian }: UpdateStudent): Promise<any> {
     try {
-      const student = await StudentModel.findById(id)
-      if (student == null) throw CustomError.notFound('Student not found')
+      const updateData: {
+        password?: string
+        program?: mongoose.Types.ObjectId
+        guardian?: mongoose.Types.ObjectId
+      } = {}
 
       if (password != null) {
         const salt = await bcrypt.genSalt(10)
         password = await bcrypt.hash(password, salt)
-        student.password = password
+        updateData.password = password
       }
 
       if (program != null) {
         await verifyProgramExists(program)
-        student.program = program as unknown as mongoose.Types.ObjectId
+        updateData.program = program as unknown as mongoose.Types.ObjectId
       }
 
       if (guardian != null) {
         await verifyGuardianExist(guardian)
-        student.guardian = guardian as unknown as mongoose.Types.ObjectId
+        updateData.guardian = guardian as unknown as mongoose.Types.ObjectId
       }
 
-      await student.save()
+      const updatedStudent = await StudentModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+      if (updatedStudent == null) throw CustomError.notFound('Student not found')
 
-      return student
+      return updatedStudent
     } catch (error) {
       throw CustomError.internalServerError(`Error updating student: ${error as string}`)
     }

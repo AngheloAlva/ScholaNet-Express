@@ -1,9 +1,10 @@
 import { verifyEvaluationExists, verifyCourseExists } from '../../helpers/index'
-import { EvaluationModel } from '../../data/models/index'
 import { CustomError } from '../../domain/errors/custom.error'
+import { EvaluationModel } from '../../data/models/index'
 
 import type { CreateEvaluation, UpdateEvaluation } from '../../interfaces/evaluation.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
+import type { Question } from '../../interfaces/question.interfaces'
 import type { ObjectId } from 'mongoose'
 
 export interface Submission {
@@ -78,16 +79,24 @@ export class EvaluationService {
     id, title, description, dueDate, questions
   }: UpdateEvaluation): Promise<any> {
     try {
-      const evaluation = await verifyEvaluationExists(id)
+      const updateData: {
+        title?: string
+        description?: string
+        dueDate?: Date
+        questions?: Question[]
+      } = {}
 
-      if (title != null) evaluation.title = title
-      if (description != null) evaluation.description = description
-      if (dueDate != null) evaluation.dueDate = dueDate
-      if (questions != null) evaluation.questions = questions
+      if (title != null) updateData.title = title
+      if (description != null) updateData.description = description
+      if (dueDate != null) updateData.dueDate = dueDate
+      if (questions != null) updateData.questions = questions
 
-      await evaluation.save()
+      const updatedEvaluation = await EvaluationModel.findByIdAndUpdate(id, updateData, {
+        new: true
+      })
+      if (updatedEvaluation == null) throw CustomError.notFound('Evaluation not found')
 
-      return evaluation
+      return updatedEvaluation
     } catch (error) {
       throw CustomError.internalServerError(`Error updating Evaluation: ${error as string}`)
     }
@@ -95,10 +104,10 @@ export class EvaluationService {
 
   async deleteEvaluation (id: ObjectId): Promise<any> {
     try {
-      const evaluation = await verifyEvaluationExists(id)
+      const evaluation = await EvaluationModel.findByIdAndDelete(id)
       if (evaluation == null) throw CustomError.notFound('Evaluation not found')
 
-      await evaluation.deleteOne()
+      return evaluation
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting Evaluation: ${error as string}`)
     }

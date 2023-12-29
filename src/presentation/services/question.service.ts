@@ -63,23 +63,32 @@ export class QuestionService {
     questionId, questionText, options, correctAnswer, points, questionType, evaluation
   }: UpdateQuestion): Promise<any> {
     try {
-      const question = await QuestionModel.findById(questionId)
-      if (question == null) throw CustomError.notFound('Question not found')
+      const updateData: {
+        questionText?: string
+        options?: string[]
+        correctAnswer?: string
+        points?: number
+        questionType?: string
+        evaluation?: ObjectId
+      } = {}
 
       if (evaluation != null) {
         await verifyEvaluationExists(evaluation)
-        question.evaluation = evaluation as any
+        updateData.evaluation = evaluation as any
       }
 
-      if (options != null) question.options = options
-      if (correctAnswer != null) question.correctAnswer = correctAnswer
-      if (questionText != null) question.questionText = questionText
-      if (points != null) question.points = points
-      if (questionType != null) question.questionType = questionType
+      if (options != null) updateData.options = options
+      if (correctAnswer != null) updateData.correctAnswer = correctAnswer
+      if (questionText != null) updateData.questionText = questionText
+      if (points != null) updateData.points = points
+      if (questionType != null) updateData.questionType = questionType
 
-      await question.save()
+      const updatedQuestion = await QuestionModel.findByIdAndUpdate(questionId, updateData, {
+        new: true
+      })
+      if (updatedQuestion == null) throw CustomError.notFound('Question not found')
 
-      return question
+      return updatedQuestion
     } catch (error) {
       throw CustomError.internalServerError(`Error updating question: ${error as string}`)
     }
