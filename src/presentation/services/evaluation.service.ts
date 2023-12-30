@@ -1,6 +1,6 @@
-import { verifyEvaluationExists, verifyCourseExists } from '../../helpers/index'
+import { verifyEvaluationExists } from '../../helpers/index'
 import { CustomError } from '../../domain/errors/custom.error'
-import { EvaluationModel } from '../../data/models/index'
+import { CourseInstanceModel, EvaluationModel } from '../../data/models/index'
 
 import type { CreateEvaluation, UpdateEvaluation } from '../../interfaces/evaluation.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -21,10 +21,10 @@ export interface Submission {
 
 export class EvaluationService {
   async createEvaluation ({
-    title, description, dueDate, courseInstance, type, questions
+    title, description, dueDate, courseInstance, type
   }: CreateEvaluation): Promise<any> {
     try {
-      const courseInstanceExist = await verifyCourseExists(courseInstance)
+      const courseInstanceExist = await CourseInstanceModel.findById(courseInstance)
       if (courseInstanceExist == null) throw CustomError.badRequest('Course Instance does not exist')
 
       const newEvaluation = new EvaluationModel({
@@ -32,8 +32,7 @@ export class EvaluationService {
         description,
         dueDate,
         courseInstance,
-        type,
-        questions
+        type
       })
       await newEvaluation.save()
 
@@ -124,6 +123,32 @@ export class EvaluationService {
       return evaluation
     } catch (error) {
       throw CustomError.internalServerError(`Error adding submission: ${error as string}`)
+    }
+  }
+
+  async gradeSubmission (submissionId: ObjectId, answers: Array<{ id: ObjectId, score: number, feedback: string }>): Promise<any> {
+    try {
+      const evaluation = await EvaluationModel.findOne({ 'submissions._id': submissionId })
+      if (evaluation == null) throw CustomError.notFound('Submission not found')
+
+      let totalScore = 0
+
+      const submission = (evaluation.submissions as any).id(submissionId)
+
+      answers.forEach(answerData => {
+        const answer = submission.answers.id(answerData.id)
+        answer.score = answerData.score
+        answer.feedback = answerData.feedback
+
+        totalScore += answerData.score
+      })
+
+      submission.totalScore = totalScore
+      await evaluation.save()
+
+      return evaluation
+    } catch (error) {
+      throw CustomError.internalServerError(`Error grading submission: ${error as string}`)
     }
   }
 }

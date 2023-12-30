@@ -21,14 +21,13 @@ export class EvaluationController {
 
   createEvaluation = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, dueDate, courseInstance, type, questions } = req.body
+      const { title, description, dueDate, courseInstance, type } = req.body
       const newEvaluation = await this.evaluationService.createEvaluation({
         title,
         description,
         dueDate,
         courseInstance,
-        type,
-        questions
+        type
       })
       res.status(201).json(newEvaluation)
     } catch (error) {
@@ -47,6 +46,19 @@ export class EvaluationController {
         total,
         evaluations
       })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  gradeSubmission = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { submissionId } = req.params
+      const { answers } = req.body
+
+      const evaluation = await this.evaluationService.gradeSubmission(submissionId as unknown as ObjectId, answers)
+
+      res.status(200).json(evaluation)
     } catch (error) {
       this.handleError(error, res)
     }

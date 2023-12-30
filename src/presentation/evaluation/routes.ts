@@ -25,7 +25,6 @@ export class EvaluationRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
       body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
-      body('questions').isArray().notEmpty().withMessage('Questions is required'),
       validate
     ], controller.createEvaluation)
     router.post('/evaluation/submission/:id', [
@@ -34,12 +33,15 @@ export class EvaluationRoutes {
       body('submission.answers').isArray().notEmpty().withMessage('Answers are required'),
       body('submission.answers.*.question').isMongoId().withMessage('Question ID is required'),
       body('submission.answers.*.answer').isArray().withMessage('Answer content is required'),
-      body('submission.answers.*.score').optional().isNumeric().withMessage('Score must be a number'),
-      body('submission.answers.*.feedback').optional().isString(),
-      body('submission.totalScore').optional().isNumeric().withMessage('Total score must be a number'),
-      body('submission.feedback').optional().isString(),
       validate
     ], controller.addSubmission)
+    router.post('/evaluation/submission/:submissionId/grade', [
+      param('submissionId').isMongoId().withMessage('Invalid evaluation ID'),
+      body('answers.*.id').isMongoId().withMessage('Answer ID is required'),
+      body('answers.*.score').isNumeric().withMessage('Score is required'),
+      body('answers.*.feedback').isString().withMessage('Feedback is required'),
+      validate
+    ], controller.gradeSubmission)
 
     router.put('/evaluation/:id', [
       param('id').isMongoId().optional().withMessage('Id is required'),

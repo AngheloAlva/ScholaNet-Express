@@ -26,7 +26,13 @@ const evaluationSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Question'
       },
-      answer: [String],
+      answer: [{
+        question: {
+          type: Schema.Types.ObjectId,
+          ref: 'Question'
+        },
+        answer: String
+      }],
       score: Number,
       feedback: String
     }],

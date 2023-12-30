@@ -1,4 +1,4 @@
-import type { Question } from './question.interface'
+import type { Question } from './question.interfaces'
 import type { ObjectId } from 'mongoose'
 
 export interface CreateEvaluation {
@@ -7,7 +7,6 @@ export interface CreateEvaluation {
   dueDate: Date
   courseInstance: ObjectId
   type: string
-  questions: Question[]
 }
 
 export interface UpdateEvaluation {
