@@ -2,13 +2,13 @@ import mongoose, { Schema } from 'mongoose'
 
 const attendanceSchema = new Schema({
   date: Date,
-  person: {
+  student: {
     type: Schema.Types.ObjectId,
-    ref: 'onModel'
+    ref: 'Student'
   },
-  onModel: {
-    type: String,
-    enum: ['Student', 'Teacher']
+  teacher: {
+    type: Schema.Types.ObjectId,
+    ref: 'Teacher'
   },
   courseInstance: {
     type: Schema.Types.ObjectId,
