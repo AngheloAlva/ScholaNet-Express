@@ -132,7 +132,6 @@ export class EvaluationService {
       if (evaluation == null) throw CustomError.notFound('Submission not found')
 
       let totalScore = 0
-
       const submission = (evaluation.submissions as any).id(submissionId)
 
       answers.forEach(answerData => {
@@ -143,7 +142,13 @@ export class EvaluationService {
         totalScore += answerData.score
       })
 
+      const maxScore = evaluation.maxScore ?? 0
+      const grade = (totalScore / maxScore) * 10
+
       submission.totalScore = totalScore
+
+      submission.grade = grade
+
       await evaluation.save()
 
       return evaluation

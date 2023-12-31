@@ -16,6 +16,7 @@ const evaluationSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Question'
   }],
+  maxScore: Number,
   submissions: [{
     student: {
       type: Schema.Types.ObjectId,
@@ -37,7 +38,8 @@ const evaluationSchema = new Schema({
       feedback: String
     }],
     totalScore: Number,
-    feedback: String
+    feedback: String,
+    grade: Number
   }]
 })
 

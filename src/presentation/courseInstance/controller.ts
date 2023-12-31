@@ -118,8 +118,8 @@ export class CourseInstanceController {
     try {
       const { studentId, courseInstanceId } = req.params
       const averageGrade = await this.courseInstanceService.getAverageGradeByStudent(
-        studentId as unknown as ObjectId,
-        courseInstanceId as unknown as ObjectId
+        courseInstanceId as unknown as ObjectId,
+        studentId as unknown as ObjectId
       )
 
       res.status(200).json(averageGrade)
