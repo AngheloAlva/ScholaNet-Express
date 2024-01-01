@@ -18,17 +18,27 @@ export class ScheduleRoutes {
     router.get('/schedule/:id', idValidation, controller.getScheduleById)
 
     router.post('/schedule', [
-      body('assignedStudents').isArray().notEmpty().withMessage('Assigned students are required'),
-      body('courseInstances').isArray().notEmpty().withMessage('Course instances are required'),
       body('name').isString().notEmpty().withMessage('Name is required'),
+      body('days').isArray().withMessage('Days must be an array'),
+      body('days.*.day').isString().isIn(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']).withMessage('Day must be a valid day'),
+      body('days.*.blocks').isArray().withMessage('Blocks must be an array'),
+      body('days.*.blocks.*.startTime').isString().notEmpty().withMessage('Start time is required'),
+      body('days.*.blocks.*.endTime').isString().notEmpty().withMessage('End time is required'),
+      body('days.*.blocks.*.courseInstance').isMongoId().notEmpty().withMessage('Course instance must be a valid MongoId'),
+      body('days.*.blocks.*.assignedStudents').isArray().withMessage('Assigned students must be an array'),
       validate
     ], controller.createSchedule)
 
     router.put('/schedule/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
-      body('assignedStudents').optional().isArray().withMessage('Assigned students must be an array'),
-      body('courseInstances').optional().isArray().withMessage('Course instances must be an array'),
       body('name').optional().isString().withMessage('Name must be a string'),
+      body('days').optional().isArray().withMessage('Days must be an array'),
+      body('days.*.day').optional().isString().isIn(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']).withMessage('Day must be a valid day'),
+      body('days.*.blocks').optional().isArray().withMessage('Blocks must be an array'),
+      body('days.*.blocks.*.startTime').optional().isString().notEmpty().withMessage('Start time is required'),
+      body('days.*.blocks.*.endTime').optional().isString().notEmpty().withMessage('End time is required'),
+      body('days.*.blocks.*.courseInstance').optional().isMongoId().notEmpty().withMessage('Course instance must be a valid MongoId'),
+      body('days.*.blocks.*.assignedStudents').optional().isArray().withMessage('Assigned students must be an array'),
       validate
     ], controller.updateSchedule)
 

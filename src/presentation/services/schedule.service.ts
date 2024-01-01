@@ -7,12 +7,11 @@ import type { ObjectId } from 'mongoose'
 
 export class ScheduleService {
   async createSchedule ({
-    assignedStudents, courseInstances, name
+    name, days
   }: Schedule): Promise<any> {
     try {
       const schedule = await ScheduleModel.create({
-        assignedStudents,
-        courseInstances,
+        days,
         name
       })
 
@@ -27,8 +26,10 @@ export class ScheduleService {
       const [total, schedules] = await Promise.all([
         ScheduleModel.countDocuments(),
         ScheduleModel.find()
-          .populate('assignedStudents')
-          .populate('courseInstances')
+          .populate({
+            path: 'days.blocks.courseInstance',
+            populate: { path: 'course' }
+          })
           .skip((page - 1) * limit)
           .limit(limit)
       ])
@@ -45,8 +46,11 @@ export class ScheduleService {
   async getScheduleById (scheduleId: string): Promise<any> {
     try {
       const schedule = await ScheduleModel.findById(scheduleId)
-        .populate('assignedStudents')
-        .populate('courseInstances')
+        .populate({
+          path: 'days.blocks.courseInstance',
+          populate: { path: 'course' }
+        })
+        .populate('days.blocks.assignedStudents')
 
       if (schedule == null) throw CustomError.notFound('Schedule not found')
 
@@ -57,18 +61,24 @@ export class ScheduleService {
   }
 
   async updateSchedule (scheduleId: string, {
-    assignedStudents, courseInstances, name
+    name, days
   }: Schedule): Promise<any> {
     try {
       const updateData: {
-        assignedStudents?: ObjectId[]
-        courseInstances?: ObjectId[]
         name?: string
+        days?: [{
+          day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
+          blocks: [{
+            startTime: string
+            endTime: string
+            courseInstance: ObjectId
+            assignedStudents: ObjectId[]
+          }]
+        }]
       } = {}
 
-      if (assignedStudents != null) updateData.assignedStudents = assignedStudents
-      if (courseInstances != null) updateData.courseInstances = courseInstances
       if (name != null) updateData.name = name
+      if (days != null) updateData.days = days
 
       const updatedSchedule = await ScheduleModel.findByIdAndUpdate(scheduleId, updateData, {
         new: true

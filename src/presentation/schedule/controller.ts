@@ -19,11 +19,10 @@ export class ScheduleController {
 
   createSchedule = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { assignedStudents, courseInstances, name } = req.body
+      const { name, days } = req.body
       const newSchedule = await this.scheduleService.createSchedule({
-        assignedStudents,
-        courseInstances,
-        name
+        name,
+        days
       })
 
       res.status(201).json(newSchedule)
@@ -64,11 +63,10 @@ export class ScheduleController {
   updateSchedule = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const { assignedStudents, courseInstances, name } = req.body
+      const { name, days } = req.body
       const updatedSchedule = await this.scheduleService.updateSchedule(id, {
-        assignedStudents,
-        courseInstances,
-        name
+        name,
+        days
       })
 
       res.status(200).json(updatedSchedule)
