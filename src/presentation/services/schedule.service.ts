@@ -1,5 +1,5 @@
+import { CourseInstanceModel, ScheduleModel } from '../../data/models'
 import { CustomError } from '../../domain/errors/custom.error'
-import { ScheduleModel } from '../../data/models/schedule'
 
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { Schedule } from '../../interfaces/schedule.interfaces'
@@ -10,10 +10,32 @@ export class ScheduleService {
     name, days
   }: Schedule): Promise<any> {
     try {
+      const session = await ScheduleModel.startSession()
+      session.startTransaction()
+
+      const courseInstances = days.flatMap(day => day.blocks.map(block => block.courseInstance))
+
+      const existingCourseInstances = await CourseInstanceModel.find({
+        _id: { $in: courseInstances }
+      }).session(session)
+
+      if (existingCourseInstances.length !== courseInstances.length) {
+        throw CustomError.badRequest('Course instance not found')
+      }
+
       const schedule = await ScheduleModel.create({
         days,
         name
       })
+
+      await CourseInstanceModel.updateMany({
+        _id: { $in: courseInstances }
+      }, {
+        schedule: schedule._id
+      }, { session })
+
+      await session.commitTransaction()
+      void session.endSession()
 
       return schedule
     } catch (error) {
@@ -97,6 +119,20 @@ export class ScheduleService {
       if (deletedSchedule == null) throw CustomError.notFound('Schedule not found')
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting schedule: ${error as string}`)
+    }
+  }
+
+  async getCoursesWithoutSchedule (): Promise<any> {
+    try {
+      const coursesWithoutSchedule = await CourseInstanceModel.find({
+        schedule: { $exists: false }
+      })
+        .populate('course')
+        .populate('teacher')
+
+      return coursesWithoutSchedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting courses without schedule: ${error as string}`)
     }
   }
 }

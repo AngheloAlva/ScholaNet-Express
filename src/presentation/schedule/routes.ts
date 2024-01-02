@@ -16,6 +16,7 @@ export class ScheduleRoutes {
 
     router.get('/schedules', controller.getSchedules)
     router.get('/schedule/:id', idValidation, controller.getScheduleById)
+    router.get('/schedule/wihoutSchedule', controller.getCoursesWithoutSchedule)
 
     router.post('/schedule', [
       body('name').isString().notEmpty().withMessage('Name is required'),

@@ -20,12 +20,11 @@ export class CourseInstanceController {
 
   createCourseInstance = async (req: any, res: Response): Promise<void> => {
     try {
-      const { academicYear, classroom, course, schedule, semester, teacher } = req.body
+      const { academicYear, classroom, course, semester, teacher } = req.body
       const newCourseInstance = await this.courseInstanceService.createCourseInstance({
         academicYear,
         classroom,
         course,
-        schedule,
         semester,
         teacher
       })

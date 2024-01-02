@@ -8,7 +8,7 @@ import type { ObjectId } from 'mongoose'
 
 export class CourseInstanceService {
   async createCourseInstance ({
-    academicYear, classroom, course, schedule, semester, teacher
+    academicYear, classroom, course, semester, teacher
   }: CreateCourseInstance): Promise<any> {
     try {
       await verifyCourseExists(course)
@@ -17,7 +17,7 @@ export class CourseInstanceService {
       if (semesterExist == null) throw CustomError.badRequest('Semester does not exist')
 
       const courseInstance = new CourseInstanceModel({
-        academicYear, classroom, course, schedule, semester, teacher
+        academicYear, classroom, course, semester, teacher
       })
       await courseInstance.save()
 

@@ -85,4 +85,14 @@ export class ScheduleController {
       this.handleError(error, res)
     }
   }
+
+  getCoursesWithoutSchedule = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const courseInstances = await this.scheduleService.getCoursesWithoutSchedule()
+
+      res.status(200).json(courseInstances)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }
