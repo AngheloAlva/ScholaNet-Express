@@ -126,4 +126,25 @@ export class CourseInstanceController {
       this.handleError(error, res)
     }
   }
+
+  getCourseInstancesByTeacher = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const actualYear = new Date().getFullYear()
+
+      const { teacherId } = req.params
+      const { academicYear } = req.query
+
+      const { schedules, courseInstances } = await this.courseInstanceService.getCourseInstancesByTeacher(
+        teacherId as unknown as ObjectId,
+        academicYear?.toString() ?? actualYear.toString()
+      )
+
+      res.status(200).json({
+        schedules,
+        courseInstances
+      })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

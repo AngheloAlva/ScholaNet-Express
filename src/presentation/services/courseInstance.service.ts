@@ -59,6 +59,9 @@ export class CourseInstanceService {
         .populate('teacher')
         .populate('semester')
         .populate('students')
+        .populate('schedule')
+        .populate('attendances')
+        .populate('evaluations')
 
       return courseInstance
     } catch (error) {
@@ -122,6 +125,7 @@ export class CourseInstanceService {
       if (courseInstance == null) throw CustomError.notFound('Course instance not found')
 
       const evaluations = await EvaluationModel.find({ courseInstance: id })
+        .populate('courseInstance')
       if (evaluations == null) throw CustomError.notFound('Evaluations not found')
 
       return evaluations
@@ -170,6 +174,49 @@ export class CourseInstanceService {
       return averageGrade
     } catch (error) {
       throw CustomError.internalServerError(`Error getting average grade: ${error as string}`)
+    }
+  }
+
+  async getCourseInstancesByTeacher (id: ObjectId, academicYear: string): Promise<any> {
+    try {
+      const today = new Date()
+      const dayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' })
+
+      const courseInstances = await CourseInstanceModel.find({
+        teacher: id,
+        academicYear
+      })
+        .populate('course')
+        .populate('semester')
+        .populate({
+          path: 'schedule',
+          match: { 'days.day': dayOfWeek },
+          populate: {
+            path: 'days.blocks.courseInstance',
+            model: 'CourseInstance'
+          }
+        })
+
+      if (courseInstances == null) throw CustomError.notFound('Course instances not found')
+
+      const schedules = courseInstances
+        .map(courseInstance => {
+          if (courseInstance.schedule != null) {
+            return (courseInstance.schedule as any).days
+              .filter((day: { day: string }) => day.day === 'Monday')
+              .flatMap((day: { blocks: any }) => day.blocks)
+          }
+          return []
+        })
+        .flat()
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+
+      return {
+        courseInstances,
+        schedules
+      }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting course instances: ${error as string}`)
     }
   }
 }

@@ -27,6 +27,11 @@ export class CourseInstanceRoutes {
       param('studentId').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
       validate
     ], controller.getAverageGradeByStudent)
+    router.get('/course-instance/teacher/:teacherId', [
+      param('teacherId').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
+      query('academicYear').optional().isString(),
+      validate
+    ], controller.getCourseInstancesByTeacher)
 
     router.post('/course-instance', [
       body('academicYear').notEmpty().withMessage('Academic year is required'),
