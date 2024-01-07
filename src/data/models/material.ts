@@ -5,7 +5,7 @@ const materialSchema = new Schema({
   description: String,
   type: {
     type: String,
-    enum: ['pdf', 'link', 'file']
+    enum: ['pdf', 'link', 'video']
   },
   url: String,
   courseInstance: {

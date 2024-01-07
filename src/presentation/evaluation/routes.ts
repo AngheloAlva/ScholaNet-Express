@@ -25,7 +25,6 @@ export class EvaluationRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
       body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
-      body('maxScore').isNumeric().notEmpty().withMessage('Max score is required'),
       validate
     ], controller.createEvaluation)
     router.post('/evaluation/submission/:id', [
@@ -50,6 +49,7 @@ export class EvaluationRoutes {
       body('description').isString().optional().withMessage('Description is required'),
       body('dueDate').isString().optional().withMessage('Due date is required'),
       body('questions').isArray().optional().withMessage('Questions is required'),
+      body('maxScore').isNumeric().optional().withMessage('Max score is required'),
       validate
     ], controller.updateEvaluation)
 

@@ -8,21 +8,17 @@ import type { ObjectId } from 'mongoose'
 
 export class QuestionService {
   async createQuestion ({
-    questionText, options, correctAnswer, points, questionType, evaluation
-  }: Question): Promise<any> {
+    questions, evaluation
+  }: { questions: Question[], evaluation: ObjectId }): Promise<any> {
     try {
       await verifyEvaluationExists(evaluation)
 
-      const question = await QuestionModel.create({
-        questionText,
-        options,
-        correctAnswer,
-        points,
-        questionType,
+      const newQuestions = await QuestionModel.create(questions.map(question => ({
+        ...question,
         evaluation
-      })
+      })))
 
-      return question
+      return newQuestions
     } catch (error) {
       throw CustomError.internalServerError(`Error creating question: ${error as string}`)
     }

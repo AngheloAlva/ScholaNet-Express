@@ -1,5 +1,6 @@
 import { CustomError } from '../../domain/errors/custom.error'
 
+import type { Question } from '../../interfaces/question.interfaces'
 import type { QuestionService } from '../services/question.service'
 import type { Request, Response } from 'express'
 import type { ObjectId } from 'mongoose'
@@ -20,13 +21,9 @@ export class QuestionController {
 
   createQuestion = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { questionText, options, correctAnswer, points, questionType, evaluation } = req.body
+      const { questions, evaluation }: { questions: Question[], evaluation: ObjectId } = req.body
       const newQuestion = await this.questionService.createQuestion({
-        questionText,
-        options,
-        correctAnswer,
-        points,
-        questionType,
+        questions,
         evaluation
       })
 

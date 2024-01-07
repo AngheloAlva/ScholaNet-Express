@@ -20,7 +20,7 @@ export class MaterialRoutes {
     router.post('/material', [
       body('title').isString().notEmpty().withMessage('Title is required'),
       body('description').isString().notEmpty().withMessage('Description is required'),
-      body('type').isString().isIn(['pdf', 'link', 'file']).withMessage('Type is required, must be one of [pdf, link, file]'),
+      body('type').isString().isIn(['pdf', 'link', 'video']).withMessage('Type is required, must be one of [pdf, link, file]'),
       body('url').isURL().notEmpty().withMessage('Url is required'),
       body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
       validate
