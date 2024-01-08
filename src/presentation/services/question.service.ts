@@ -5,18 +5,22 @@ import { verifyEvaluationExists } from '../../helpers'
 import type { Question, UpdateQuestion } from '../../interfaces/question.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { ObjectId } from 'mongoose'
+import { EvaluationModel } from '../../data/models'
 
 export class QuestionService {
   async createQuestion ({
     questions, evaluation
   }: { questions: Question[], evaluation: ObjectId }): Promise<any> {
     try {
-      await verifyEvaluationExists(evaluation)
+      const evaluationExist = await verifyEvaluationExists(evaluation)
 
       const newQuestions = await QuestionModel.create(questions.map(question => ({
         ...question,
         evaluation
       })))
+
+      evaluationExist.questions.push(...newQuestions.map(question => question._id.toString()))
+      await evaluationExist.save()
 
       return newQuestions
     } catch (error) {
@@ -92,8 +96,14 @@ export class QuestionService {
 
   async deleteQuestion (questionId: ObjectId): Promise<any> {
     try {
-      const question = await QuestionModel.findByIdAndRemove(questionId)
+      const evaluation = await EvaluationModel.findOne({ questions: questionId })
+      if (evaluation == null) throw CustomError.notFound('Evaluation not found')
+
+      const question = await QuestionModel.findByIdAndDelete(questionId)
       if (question == null) throw CustomError.notFound('Question not found')
+
+      evaluation.questions = evaluation.questions.filter(question => !question.equals(String(questionId)))
+      await evaluation.save()
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting question: ${error as string}`)
     }
