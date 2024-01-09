@@ -17,6 +17,7 @@ export class ScheduleRoutes {
     router.get('/schedules', controller.getSchedules)
     router.get('/schedule/:id', idValidation, controller.getScheduleById)
     router.get('/schedule/wihoutSchedule', controller.getCoursesWithoutSchedule)
+    router.get('/schedule/student/:id', idValidation, controller.getScheduleByStudentId)
 
     router.post('/schedule', [
       body('name').isString().notEmpty().withMessage('Name is required'),
@@ -29,6 +30,12 @@ export class ScheduleRoutes {
       body('days.*.blocks.*.assignedStudents').isArray().withMessage('Assigned students must be an array'),
       validate
     ], controller.createSchedule)
+    router.post('/schedule/:id/add-students/', [
+      param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),
+      body('students').isArray().withMessage('Students must be an array'),
+      body('students.*').isMongoId().notEmpty().withMessage('Student must be a valid MongoId'),
+      validate
+    ], controller.addStudentsToSchedule)
 
     router.put('/schedule/:id', [
       param('id').isMongoId().notEmpty().withMessage('Id must be a valid MongoId'),

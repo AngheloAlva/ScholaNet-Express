@@ -6,11 +6,7 @@ const blockSchema = new Schema({
   courseInstance: {
     type: Schema.Types.ObjectId,
     ref: 'CourseInstance'
-  },
-  assignedStudents: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Student'
-  }]
+  }
 })
 
 const daySchema = new Schema({
@@ -23,7 +19,11 @@ const daySchema = new Schema({
 
 const scheduleSchema = new Schema({
   name: String,
-  days: [daySchema]
+  days: [daySchema],
+  assignedStudents: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Student'
+  }]
 })
 
 export const ScheduleModel = mongoose.model('Schedule', scheduleSchema)

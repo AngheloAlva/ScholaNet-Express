@@ -95,4 +95,27 @@ export class ScheduleController {
       this.handleError(error, res)
     }
   }
+
+  getScheduleByStudentId = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const schedule = await this.scheduleService.getScheduleByStudentId(id)
+
+      res.status(200).json(schedule)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  addStudentsToSchedule = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { students } = req.body
+      const schedule = await this.scheduleService.addStudentsToSchedule(id, students)
+
+      res.status(200).json(schedule)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
 }

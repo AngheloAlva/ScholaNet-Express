@@ -1,4 +1,4 @@
-import { CourseInstanceModel, ScheduleModel } from '../../data/models'
+import { CourseInstanceModel, ScheduleModel, StudentModel } from '../../data/models'
 import { CustomError } from '../../domain/errors/custom.error'
 
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -133,6 +133,54 @@ export class ScheduleService {
       return coursesWithoutSchedule
     } catch (error) {
       throw CustomError.internalServerError(`Error getting courses without schedule: ${error as string}`)
+    }
+  }
+
+  async getScheduleByStudentId (studentId: string): Promise<any> {
+    try {
+      const schedule = await ScheduleModel.findOne({ assignedStudents: studentId })
+        .populate({
+          path: 'days.blocks.courseInstance',
+          populate: { path: 'course' }
+        })
+
+      if (schedule == null) throw CustomError.notFound('Schedule not found')
+
+      return schedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting schedule by student id: ${error as string}`)
+    }
+  }
+
+  async addStudentsToSchedule (scheduleId: string, students: string[]): Promise<any> {
+    try {
+      const schedule = await ScheduleModel.findById(scheduleId)
+      if (schedule == null) throw CustomError.notFound('Schedule not found')
+
+      const session = await ScheduleModel.startSession()
+      session.startTransaction()
+
+      const existingStudents = await StudentModel.find({
+        _id: { $in: students }
+      }).session(session)
+
+      if (existingStudents.length !== students.length) throw CustomError.badRequest('Student not found')
+
+      await ScheduleModel.findByIdAndUpdate(scheduleId, {
+        $addToSet: { assignedStudents: { $each: students } }
+      }, { session })
+
+      await CourseInstanceModel.updateMany({
+        schedule: scheduleId
+      }, {
+        $addToSet: { students: { $each: students } }
+      }, { session })
+
+      await session.commitTransaction()
+
+      return schedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error adding students to schedule: ${error as string}`)
     }
   }
 }
