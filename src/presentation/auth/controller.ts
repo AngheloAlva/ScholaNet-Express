@@ -101,9 +101,13 @@ export class AuthController {
   loginStudent = async (req: Request, res: Response): Promise<void> => {
     try {
       const { rut, password } = req.body
-      const { token, refreshToken } = await this.authService.loginStudent({ rut, password })
+      const { token, refreshToken, studentId } = await this.authService.loginStudent({ rut, password })
 
-      res.status(200).json({ token, refreshToken })
+      res.status(200).json({
+        token,
+        refreshToken,
+        studentId
+      })
     } catch (error) {
       this.handleError(error, res)
     }

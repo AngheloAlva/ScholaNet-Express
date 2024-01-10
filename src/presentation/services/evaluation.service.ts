@@ -65,6 +65,7 @@ export class EvaluationService {
     try {
       const evaluation = await EvaluationModel.findById(id)
         .populate('courseInstance')
+        .populate('questions')
 
       if (evaluation == null) throw CustomError.notFound('Evaluation not found')
 
