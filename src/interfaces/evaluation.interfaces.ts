@@ -7,6 +7,7 @@ export interface CreateEvaluation {
   dueDate: Date
   courseInstance: ObjectId
   type: string
+  duration: number
 }
 
 export interface UpdateEvaluation {
@@ -15,4 +16,5 @@ export interface UpdateEvaluation {
   description?: string
   dueDate?: Date
   questions?: Question[]
+  duration?: number
 }

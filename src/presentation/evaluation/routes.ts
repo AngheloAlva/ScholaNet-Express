@@ -25,14 +25,17 @@ export class EvaluationRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('dueDate').isString().notEmpty().withMessage('Due date is required'),
       body('courseInstance').isMongoId().notEmpty().withMessage('Course Instance is required'),
+      body('duration').isNumeric().notEmpty().withMessage('Duration is required'),
       validate
     ], controller.createEvaluation)
     router.post('/evaluation/submission/:id', [
       param('id').isMongoId().withMessage('Invalid evaluation ID'),
+      body('submission').isObject().notEmpty().withMessage('Submission is required'),
       body('submission.student').isMongoId().notEmpty().withMessage('Student ID is required'),
       body('submission.answers').isArray().notEmpty().withMessage('Answers are required'),
       body('submission.answers.*.question').isMongoId().withMessage('Question ID is required'),
       body('submission.answers.*.answer').isArray().withMessage('Answer content is required'),
+      body('submission.endTime').isString().withMessage('End time is required'),
       validate
     ], controller.addSubmission)
     router.post('/evaluation/submission/:submissionId/grade', [
@@ -42,6 +45,11 @@ export class EvaluationRoutes {
       body('answers.*.feedback').isString().withMessage('Feedback is required'),
       validate
     ], controller.gradeSubmission)
+    router.post('/evaluation/:id/start', [
+      param('id').isMongoId().withMessage('Invalid evaluation ID'),
+      body('studentId').isMongoId().withMessage('Student ID is required'),
+      validate
+    ], controller.startEvaluation)
 
     router.put('/evaluation/:id', [
       param('id').isMongoId().optional().withMessage('Id is required'),
@@ -50,6 +58,8 @@ export class EvaluationRoutes {
       body('dueDate').isString().optional().withMessage('Due date is required'),
       body('questions').isArray().optional().withMessage('Questions is required'),
       body('maxScore').isNumeric().optional().withMessage('Max score is required'),
+      body('duration').isNumeric().optional().withMessage('Duration is required'),
+      body('maxAttempts').isNumeric().optional().withMessage('Max attempts is required'),
       validate
     ], controller.updateEvaluation)
 

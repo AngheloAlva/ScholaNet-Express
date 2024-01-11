@@ -19,9 +19,14 @@ interface Evaluation {
   dueDate: Date
   type: 'paper' | 'online' | 'presentation' | 'project'
   questions: string[]
+  maxAttempts: number
+  duration: number
   submissions: Array<{
+    attempt: number
     student: ObjectId
     answers: Answer[]
+    startTime: Date
+    endTime?: Date
     score?: number
     feedback?: string
   }>

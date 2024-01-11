@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-base-to-string */
 import { verifyEvaluationExists } from '../../helpers/index'
 import { CustomError } from '../../domain/errors/custom.error'
 import { CourseInstanceModel, EvaluationModel } from '../../data/models/index'
@@ -9,6 +10,9 @@ import type { ObjectId } from 'mongoose'
 
 export interface Submission {
   student: ObjectId
+  startTime: Date
+  attempt: number
+  endTime?: Date
   answers: Array<{
     answer: string[]
     score: number
@@ -21,17 +25,18 @@ export interface Submission {
 
 export class EvaluationService {
   async createEvaluation ({
-    title, description, dueDate, courseInstance, type
+    title, description, dueDate, courseInstance, type, duration
   }: CreateEvaluation): Promise<any> {
     try {
       const courseInstanceExist = await CourseInstanceModel.findById(courseInstance)
       if (courseInstanceExist == null) throw CustomError.badRequest('Course Instance does not exist')
 
       const newEvaluation = new EvaluationModel({
-        title,
-        description,
-        dueDate,
         courseInstance,
+        description,
+        duration,
+        dueDate,
+        title,
         type
       })
       await newEvaluation.save()
@@ -76,7 +81,7 @@ export class EvaluationService {
   }
 
   async updateEvaluation ({
-    id, title, description, dueDate, questions
+    id, title, description, dueDate, questions, duration
   }: UpdateEvaluation): Promise<any> {
     try {
       const updateData: {
@@ -84,12 +89,14 @@ export class EvaluationService {
         description?: string
         dueDate?: Date
         questions?: Question[]
+        duration?: number
       } = {}
 
       if (title != null) updateData.title = title
       if (description != null) updateData.description = description
       if (dueDate != null) updateData.dueDate = dueDate
       if (questions != null) updateData.questions = questions
+      if (duration != null) updateData.duration = duration
 
       const updatedEvaluation = await EvaluationModel.findByIdAndUpdate(id, updateData, {
         new: true
@@ -113,11 +120,19 @@ export class EvaluationService {
     }
   }
 
-  async addSubmission (id: ObjectId, submission: Submission): Promise<any> {
+  async addSubmission (id: ObjectId, newSubmission: Submission): Promise<any> {
     try {
       const evaluation = await verifyEvaluationExists(id)
 
-      evaluation.submissions.push(submission)
+      const existingSubmissionIndex = evaluation.submissions.findIndex(sub =>
+        sub.student.toString() === newSubmission.student.toString()
+      )
+
+      if (existingSubmissionIndex !== -1) {
+        evaluation.submissions[existingSubmissionIndex] = newSubmission
+      } else {
+        evaluation.submissions.push(newSubmission)
+      }
 
       await evaluation.save()
 
@@ -127,7 +142,9 @@ export class EvaluationService {
     }
   }
 
-  async gradeSubmission (submissionId: ObjectId, answers: Array<{ id: ObjectId, score: number, feedback: string }>): Promise<any> {
+  async gradeSubmission (
+    submissionId: ObjectId, answers: Array<{ id: ObjectId, score: number, feedback: string }>
+  ): Promise<any> {
     try {
       const evaluation = await EvaluationModel.findOne({ 'submissions._id': submissionId })
       if (evaluation == null) throw CustomError.notFound('Submission not found')
@@ -155,6 +172,36 @@ export class EvaluationService {
       return evaluation
     } catch (error) {
       throw CustomError.internalServerError(`Error grading submission: ${error as string}`)
+    }
+  }
+
+  async startEvaluation (id: ObjectId, studentId: ObjectId): Promise<any> {
+    try {
+      const evaluation = await verifyEvaluationExists(id)
+
+      const hasAttempted = evaluation.submissions.some(sub =>
+        sub.student.toString() === studentId.toString()
+      )
+
+      if (hasAttempted) {
+        throw CustomError.badRequest('You have already attempted this evaluation')
+      }
+
+      const startTime = new Date()
+      const endTime = new Date(startTime.getTime() + evaluation.duration * 60000)
+
+      const newSubmissions = {
+        student: studentId,
+        startTime,
+        endTime
+      }
+
+      evaluation.submissions.push(newSubmissions as Submission)
+      await evaluation.save()
+
+      return { canDo: true, message: 'Evaluation started' }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error starting evaluation: ${error as string}`)
     }
   }
 }

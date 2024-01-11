@@ -21,12 +21,13 @@ export class EvaluationController {
 
   createEvaluation = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, dueDate, courseInstance, type } = req.body
+      const { title, description, dueDate, courseInstance, type, duration } = req.body
       const newEvaluation = await this.evaluationService.createEvaluation({
-        title,
-        description,
-        dueDate,
         courseInstance,
+        description,
+        duration,
+        dueDate,
+        title,
         type
       })
       res.status(201).json(newEvaluation)
@@ -110,6 +111,19 @@ export class EvaluationController {
       const evaluation = await this.evaluationService.addSubmission(id as unknown as ObjectId, submission)
 
       res.status(200).json(evaluation)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  startEvaluation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { studentId } = req.body
+
+      const response = await this.evaluationService.startEvaluation(id as unknown as ObjectId, studentId as unknown as ObjectId)
+
+      res.status(200).json(response)
     } catch (error) {
       this.handleError(error, res)
     }
