@@ -5,7 +5,6 @@ import { CustomError } from '../../domain/errors/custom.error'
 import { InscriptionModel } from '../../data/models/index'
 import { verifyGuardianExist } from '../../helpers'
 import { StudentService } from './student.service'
-import bcrypt from 'bcrypt'
 
 import type { CreateInscriptionProps } from '../../interfaces/inscription.interfaces'
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
@@ -17,9 +16,6 @@ export class InscriptionService {
   }: CreateInscriptionProps): Promise<unknown> {
     try {
       await verifyGuardianExist(guardian)
-
-      const salt = await bcrypt.genSalt(10)
-      password = await bcrypt.hash(password, salt)
 
       const studentService = new StudentService()
       const studentId = await studentService.createStudent({

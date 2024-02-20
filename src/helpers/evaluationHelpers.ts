@@ -1,7 +1,6 @@
 import { CustomError } from '../domain/errors/custom.error'
 import { EvaluationModel } from '../data/models'
 
-import type { Question } from '../interfaces/question.interfaces'
 import type { ObjectId } from 'mongoose'
 
 interface Answer {
@@ -19,10 +18,15 @@ interface Evaluation {
   course: ObjectId
   dueDate: Date
   type: 'paper' | 'online' | 'presentation' | 'project'
-  questions: Question[]
+  questions: string[]
+  maxAttempts: number
+  duration: number
   submissions: Array<{
+    attempt: number
     student: ObjectId
     answers: Answer[]
+    startTime: Date
+    endTime?: Date
     score?: number
     feedback?: string
   }>

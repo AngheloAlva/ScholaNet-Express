@@ -1,5 +1,5 @@
+import { CourseInstanceModel, ScheduleModel, StudentModel } from '../../data/models'
 import { CustomError } from '../../domain/errors/custom.error'
-import { ScheduleModel } from '../../data/models/schedule'
 
 import type { PaginationDto } from '../../domain/shared/pagination.dto'
 import type { Schedule } from '../../interfaces/schedule.interfaces'
@@ -7,14 +7,35 @@ import type { ObjectId } from 'mongoose'
 
 export class ScheduleService {
   async createSchedule ({
-    assignedStudents, courseInstances, name
+    name, days
   }: Schedule): Promise<any> {
     try {
+      const session = await ScheduleModel.startSession()
+      session.startTransaction()
+
+      const courseInstances = days.flatMap(day => day.blocks.map(block => block.courseInstance))
+
+      const existingCourseInstances = await CourseInstanceModel.find({
+        _id: { $in: courseInstances }
+      }).session(session)
+
+      if (existingCourseInstances.length !== courseInstances.length) {
+        throw CustomError.badRequest('Course instance not found')
+      }
+
       const schedule = await ScheduleModel.create({
-        assignedStudents,
-        courseInstances,
+        days,
         name
       })
+
+      await CourseInstanceModel.updateMany({
+        _id: { $in: courseInstances }
+      }, {
+        schedule: schedule._id
+      }, { session })
+
+      await session.commitTransaction()
+      void session.endSession()
 
       return schedule
     } catch (error) {
@@ -27,8 +48,10 @@ export class ScheduleService {
       const [total, schedules] = await Promise.all([
         ScheduleModel.countDocuments(),
         ScheduleModel.find()
-          .populate('assignedStudents')
-          .populate('courseInstances')
+          .populate({
+            path: 'days.blocks.courseInstance',
+            populate: { path: 'course' }
+          })
           .skip((page - 1) * limit)
           .limit(limit)
       ])
@@ -45,8 +68,11 @@ export class ScheduleService {
   async getScheduleById (scheduleId: string): Promise<any> {
     try {
       const schedule = await ScheduleModel.findById(scheduleId)
-        .populate('assignedStudents')
-        .populate('courseInstances')
+        .populate({
+          path: 'days.blocks.courseInstance',
+          populate: { path: 'course' }
+        })
+        .populate('days.blocks.assignedStudents')
 
       if (schedule == null) throw CustomError.notFound('Schedule not found')
 
@@ -57,18 +83,24 @@ export class ScheduleService {
   }
 
   async updateSchedule (scheduleId: string, {
-    assignedStudents, courseInstances, name
+    name, days
   }: Schedule): Promise<any> {
     try {
       const updateData: {
-        assignedStudents?: ObjectId[]
-        courseInstances?: ObjectId[]
         name?: string
+        days?: [{
+          day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
+          blocks: [{
+            startTime: string
+            endTime: string
+            courseInstance: ObjectId
+            assignedStudents: ObjectId[]
+          }]
+        }]
       } = {}
 
-      if (assignedStudents != null) updateData.assignedStudents = assignedStudents
-      if (courseInstances != null) updateData.courseInstances = courseInstances
       if (name != null) updateData.name = name
+      if (days != null) updateData.days = days
 
       const updatedSchedule = await ScheduleModel.findByIdAndUpdate(scheduleId, updateData, {
         new: true
@@ -87,6 +119,68 @@ export class ScheduleService {
       if (deletedSchedule == null) throw CustomError.notFound('Schedule not found')
     } catch (error) {
       throw CustomError.internalServerError(`Error deleting schedule: ${error as string}`)
+    }
+  }
+
+  async getCoursesWithoutSchedule (): Promise<any> {
+    try {
+      const coursesWithoutSchedule = await CourseInstanceModel.find({
+        schedule: { $exists: false }
+      })
+        .populate('course')
+        .populate('teacher')
+
+      return coursesWithoutSchedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting courses without schedule: ${error as string}`)
+    }
+  }
+
+  async getScheduleByStudentId (studentId: string): Promise<any> {
+    try {
+      const schedule = await ScheduleModel.findOne({ assignedStudents: studentId })
+        .populate({
+          path: 'days.blocks.courseInstance',
+          populate: { path: 'course' }
+        })
+
+      if (schedule == null) throw CustomError.notFound('Schedule not found')
+
+      return schedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting schedule by student id: ${error as string}`)
+    }
+  }
+
+  async addStudentsToSchedule (scheduleId: string, students: string[]): Promise<any> {
+    try {
+      const schedule = await ScheduleModel.findById(scheduleId)
+      if (schedule == null) throw CustomError.notFound('Schedule not found')
+
+      const session = await ScheduleModel.startSession()
+      session.startTransaction()
+
+      const existingStudents = await StudentModel.find({
+        _id: { $in: students }
+      }).session(session)
+
+      if (existingStudents.length !== students.length) throw CustomError.badRequest('Student not found')
+
+      await ScheduleModel.findByIdAndUpdate(scheduleId, {
+        $addToSet: { assignedStudents: { $each: students } }
+      }, { session })
+
+      await CourseInstanceModel.updateMany({
+        schedule: scheduleId
+      }, {
+        $addToSet: { students: { $each: students } }
+      }, { session })
+
+      await session.commitTransaction()
+
+      return schedule
+    } catch (error) {
+      throw CustomError.internalServerError(`Error adding students to schedule: ${error as string}`)
     }
   }
 }

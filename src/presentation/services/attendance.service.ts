@@ -1,5 +1,4 @@
 import { AttendanceModel, CourseInstanceModel, StudentModel, UserModel } from '../../data/models'
-import { verifyUserExistByRole } from '../../helpers/userHelpers'
 import { CustomError } from '../../domain/errors/custom.error'
 import { verifyCourseExists } from '../../helpers'
 
@@ -8,33 +7,35 @@ import type { ObjectId } from 'mongoose'
 
 export class AttendanceService {
   async createAttendance ({
-    date, person, onModel, courseInstance, status
+    date, person, courseInstance, status
   }: Attendance): Promise<any> {
     try {
       const courseInstanceExist = await CourseInstanceModel.findById(courseInstance)
       if (courseInstanceExist == null) throw CustomError.badRequest('Course instance does not exist')
 
-      await verifyUserExistByRole(person, onModel)
+      const teacherExist = await UserModel.findById(person).where('role').equals('teacher')
+      const studentExist = await StudentModel.findById(person)
 
-      const attendance = new AttendanceModel({
-        date,
-        person,
-        onModel,
-        courseInstance,
-        status
-      })
+      if ((teacherExist == null) && (studentExist == null)) throw CustomError.badRequest('Person does not exist')
 
-      await attendance.save()
-
-      if (onModel === 'Student') {
-        await StudentModel.findByIdAndUpdate(person, {
-          $push: { attendances: attendance._id }
+      let attendance
+      if (studentExist != null) {
+        attendance = new AttendanceModel({
+          date,
+          student: person,
+          courseInstance,
+          status
         })
-      } else if (onModel === 'Teacher') {
-        await UserModel.findByIdAndUpdate(person, {
-          $push: { attendances: attendance._id }
+      } else {
+        attendance = new AttendanceModel({
+          date,
+          teacher: person,
+          courseInstance,
+          status
         })
       }
+
+      await attendance.save()
 
       return attendance
     } catch (error) {
@@ -58,14 +59,14 @@ export class AttendanceService {
 
   async getAttendanceByPerson (person: ObjectId): Promise<any> {
     try {
-      const studentExist = await StudentModel.findById(person)
-      const teacherExist = await UserModel.findById(person).where('role').equals('teacher')
+      const studentExist = await StudentModel.findById(person).populate('courseInstances')
+      const teacherExist = await UserModel.findById(person).where('role').equals('teacher').populate('courseInstances')
 
       if ((studentExist == null) && (teacherExist == null)) throw CustomError.badRequest('Person does not exist')
 
-      const attendances = await AttendanceModel.find({ person })
-        .populate('person')
-        .populate('course')
+      const attendances = await AttendanceModel.find({
+        $or: [{ student: person }, { teacher: person }]
+      })
 
       return attendances
     } catch (error) {

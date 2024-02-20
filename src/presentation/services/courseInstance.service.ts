@@ -8,7 +8,7 @@ import type { ObjectId } from 'mongoose'
 
 export class CourseInstanceService {
   async createCourseInstance ({
-    academicYear, classroom, course, schedule, semester, teacher
+    academicYear, classroom, course, semester, teacher
   }: CreateCourseInstance): Promise<any> {
     try {
       await verifyCourseExists(course)
@@ -17,7 +17,7 @@ export class CourseInstanceService {
       if (semesterExist == null) throw CustomError.badRequest('Semester does not exist')
 
       const courseInstance = new CourseInstanceModel({
-        academicYear, classroom, course, schedule, semester, teacher
+        academicYear, classroom, course, semester, teacher
       })
       await courseInstance.save()
 
@@ -59,6 +59,9 @@ export class CourseInstanceService {
         .populate('teacher')
         .populate('semester')
         .populate('students')
+        .populate('schedule')
+        .populate('attendances')
+        .populate('evaluations')
 
       return courseInstance
     } catch (error) {
@@ -122,6 +125,7 @@ export class CourseInstanceService {
       if (courseInstance == null) throw CustomError.notFound('Course instance not found')
 
       const evaluations = await EvaluationModel.find({ courseInstance: id })
+        .populate('courseInstance')
       if (evaluations == null) throw CustomError.notFound('Evaluations not found')
 
       return evaluations
@@ -149,24 +153,70 @@ export class CourseInstanceService {
       const evaluations = await EvaluationModel.find({ courseInstance: courseInstanceId })
       if (evaluations == null) throw CustomError.notFound('Evaluations not found')
 
-      const studentSubmissions = evaluations.map(evaluation =>
-        evaluation.submissions.find(submission =>
+      let totalGrades = 0
+      let countGrades = 0
+
+      evaluations.forEach(evaluation => {
+        const submission = evaluation.submissions.find(submission =>
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
           submission?.student?.toString() === studentId.toString()
         )
-      )
+        if ((submission != null) && submission.grade !== null) {
+          totalGrades += submission?.grade ?? 0
+          countGrades++
+        }
+      })
 
-      const validSubmissions = studentSubmissions.filter(
-        submission => submission?.totalScore != null
-      )
-      if (validSubmissions.length === 0) return { message: 'No submissions found' }
+      if (countGrades === 0) throw CustomError.notFound('Grades not found')
 
-      const averageGrade = validSubmissions.reduce((acc, submission) =>
-        acc + (submission?.totalScore ?? 0), 0) / validSubmissions.length
+      const averageGrade = totalGrades / countGrades
 
-      return { averageGrade }
+      return averageGrade
     } catch (error) {
       throw CustomError.internalServerError(`Error getting average grade: ${error as string}`)
+    }
+  }
+
+  async getCourseInstancesByTeacher (id: ObjectId, academicYear: string): Promise<any> {
+    try {
+      const today = new Date()
+      const dayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' })
+
+      const courseInstances = await CourseInstanceModel.find({
+        teacher: id,
+        academicYear
+      })
+        .populate('course')
+        .populate('semester')
+        .populate({
+          path: 'schedule',
+          match: { 'days.day': dayOfWeek },
+          populate: {
+            path: 'days.blocks.courseInstance',
+            model: 'CourseInstance'
+          }
+        })
+
+      if (courseInstances == null) throw CustomError.notFound('Course instances not found')
+
+      const schedules = courseInstances
+        .map(courseInstance => {
+          if (courseInstance.schedule != null) {
+            return (courseInstance.schedule as any).days
+              .filter((day: { day: string }) => day.day === 'Monday')
+              .flatMap((day: { blocks: any }) => day.blocks)
+          }
+          return []
+        })
+        .flat()
+        .sort((a, b) => a.startTime.localeCompare(b.startTime))
+
+      return {
+        courseInstances,
+        schedules
+      }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error getting course instances: ${error as string}`)
     }
   }
 }

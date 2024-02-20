@@ -40,6 +40,11 @@ export class AuthRoutes {
       body('token').isString().notEmpty().withMessage('Token is required'),
       validate
     ], controller.verifyToken)
+    router.post('/auth/login-student', [
+      body('rut').isString().notEmpty().withMessage('RUT is required'),
+      body('password').isString().notEmpty().withMessage('Password is required'),
+      validate
+    ], controller.loginStudent)
 
     return router
   }

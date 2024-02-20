@@ -21,14 +21,14 @@ export class EvaluationController {
 
   createEvaluation = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { title, description, dueDate, courseInstance, type, questions } = req.body
+      const { title, description, dueDate, courseInstance, type, duration } = req.body
       const newEvaluation = await this.evaluationService.createEvaluation({
-        title,
-        description,
-        dueDate,
         courseInstance,
-        type,
-        questions
+        description,
+        duration,
+        dueDate,
+        title,
+        type
       })
       res.status(201).json(newEvaluation)
     } catch (error) {
@@ -47,6 +47,19 @@ export class EvaluationController {
         total,
         evaluations
       })
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  gradeSubmission = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { submissionId } = req.params
+      const { answers } = req.body
+
+      const evaluation = await this.evaluationService.gradeSubmission(submissionId as unknown as ObjectId, answers)
+
+      res.status(200).json(evaluation)
     } catch (error) {
       this.handleError(error, res)
     }
@@ -98,6 +111,19 @@ export class EvaluationController {
       const evaluation = await this.evaluationService.addSubmission(id as unknown as ObjectId, submission)
 
       res.status(200).json(evaluation)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  startEvaluation = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { studentId } = req.body
+
+      const response = await this.evaluationService.startEvaluation(id as unknown as ObjectId, studentId as unknown as ObjectId)
+
+      res.status(200).json(response)
     } catch (error) {
       this.handleError(error, res)
     }

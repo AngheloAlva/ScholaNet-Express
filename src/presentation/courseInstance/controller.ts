@@ -20,12 +20,11 @@ export class CourseInstanceController {
 
   createCourseInstance = async (req: any, res: Response): Promise<void> => {
     try {
-      const { academicYear, classroom, course, schedule, semester, teacher } = req.body
+      const { academicYear, classroom, course, semester, teacher } = req.body
       const newCourseInstance = await this.courseInstanceService.createCourseInstance({
         academicYear,
         classroom,
         course,
-        schedule,
         semester,
         teacher
       })
@@ -118,11 +117,32 @@ export class CourseInstanceController {
     try {
       const { studentId, courseInstanceId } = req.params
       const averageGrade = await this.courseInstanceService.getAverageGradeByStudent(
-        studentId as unknown as ObjectId,
-        courseInstanceId as unknown as ObjectId
+        courseInstanceId as unknown as ObjectId,
+        studentId as unknown as ObjectId
       )
 
       res.status(200).json(averageGrade)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getCourseInstancesByTeacher = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const actualYear = new Date().getFullYear()
+
+      const { teacherId } = req.params
+      const { academicYear } = req.query
+
+      const { schedules, courseInstances } = await this.courseInstanceService.getCourseInstancesByTeacher(
+        teacherId as unknown as ObjectId,
+        academicYear?.toString() ?? actualYear.toString()
+      )
+
+      res.status(200).json({
+        schedules,
+        courseInstances
+      })
     } catch (error) {
       this.handleError(error, res)
     }

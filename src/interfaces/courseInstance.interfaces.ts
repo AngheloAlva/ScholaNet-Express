@@ -21,12 +21,6 @@ export interface CreateCourseInstance {
   semester: ObjectId
   academicYear: string
   classroom: string
-  schedule: Array<{
-    day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'
-    startTime: string
-    endTime: string
-    duration: number
-  }>
 }
 
 export interface UpdateCourseInstance {

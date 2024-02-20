@@ -21,11 +21,12 @@ export class QuestionRoutes {
     ], controller.getQuestionsByEvaluation)
 
     router.post('/question', [
-      body('questionText').isString().notEmpty().withMessage('Question text is required'),
-      body('options').isArray().notEmpty().withMessage('Options are required'),
-      body('correctAnswer').isString().notEmpty().withMessage('Correct answer is required'),
-      body('points').isNumeric().notEmpty().withMessage('Points are required'),
-      body('questionType').isString().notEmpty().isIn(['multipleChoice', 'trueFalse', 'shortAnswer']).withMessage('Question type is required and must be one of the following: multipleChoice, trueFalse, shortAnswer'),
+      body('questions').isArray().notEmpty().withMessage('Questions are required'),
+      body('questions.*.questionText').isString().notEmpty().withMessage('Question text is required'),
+      body('questions.*.options').isArray().notEmpty().withMessage('Options are required'),
+      body('questions.*.correctAnswer').isString().notEmpty().withMessage('Correct answer is required'),
+      body('questions.*.points').isNumeric().notEmpty().withMessage('Points are required'),
+      body('questions.*.questionType').isString().notEmpty().isIn(['multipleChoice', 'trueFalse', 'shortAnswer']).withMessage('Question type is required and must be one of the following: multipleChoice, trueFalse, shortAnswer'),
       body('evaluation').isMongoId().notEmpty().withMessage('Evaluation is required'),
       validate
     ], controller.createQuestion)

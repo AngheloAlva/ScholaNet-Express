@@ -1,11 +1,11 @@
 import { CustomError } from '../../domain/errors/custom.error'
+import { StudentModel, UserModel } from '../../data/models'
 import { sendEmail } from '../../utils/sendGridMailer'
-import { UserModel } from '../../data/models'
 import { envs } from '../../config/envs'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
-import type { LoginUser } from '../../interfaces/user.interfaces'
+import type { LoginStudent, LoginUser } from '../../interfaces/user.interfaces'
 import type { ObjectId } from 'mongoose'
 
 export class AuthService {
@@ -127,6 +127,37 @@ export class AuthService {
       })
     } catch (error) {
       throw CustomError.internalServerError(`Error verifying token: ${error as string}`)
+    }
+  }
+
+  async loginStudent ({ rut, password }: LoginStudent): Promise<any> {
+    try {
+      const student = await StudentModel.findOne({ rut })
+      if (student == null) throw CustomError.notFound('Student not found')
+
+      const studentId = student._id
+
+      const validPassword = await bcrypt.compare(password, String(student.password))
+      if (!validPassword) throw CustomError.badRequest('Invalid password')
+
+      const token = jwt.sign(
+        { userId: studentId },
+        envs.TOKEN_SECRET,
+        { expiresIn: '30m' }
+      )
+
+      const refreshToken = jwt.sign(
+        { userId: studentId },
+        envs.REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
+      )
+
+      student.refreshToken = refreshToken
+      await student.save()
+
+      return { token, refreshToken, studentId }
+    } catch (error) {
+      throw CustomError.internalServerError(`Error logging in student: ${error as string}`)
     }
   }
 }

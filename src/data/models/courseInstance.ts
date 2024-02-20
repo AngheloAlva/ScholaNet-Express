@@ -19,15 +19,10 @@ const courseInstanceSchema = new Schema({
   },
   academicYear: String,
   classroom: String,
-  schedule: [{
-    day: {
-      type: String,
-      enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-    },
-    startTime: String,
-    endTime: String,
-    duration: Number
-  }],
+  schedule: {
+    type: Schema.Types.ObjectId,
+    ref: 'Schedule'
+  },
   attendances: [{
     type: Schema.Types.ObjectId,
     ref: 'Attendance'

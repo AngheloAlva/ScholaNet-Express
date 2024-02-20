@@ -5,6 +5,7 @@ const studentSchema = new Schema({
   lastName: String,
   dateOfBirth: Date,
   password: String,
+  refreshToken: String,
   guardian: {
     type: Schema.Types.ObjectId,
     ref: 'User'

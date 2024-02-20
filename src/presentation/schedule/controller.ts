@@ -19,11 +19,10 @@ export class ScheduleController {
 
   createSchedule = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { assignedStudents, courseInstances, name } = req.body
+      const { name, days } = req.body
       const newSchedule = await this.scheduleService.createSchedule({
-        assignedStudents,
-        courseInstances,
-        name
+        name,
+        days
       })
 
       res.status(201).json(newSchedule)
@@ -64,11 +63,10 @@ export class ScheduleController {
   updateSchedule = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const { assignedStudents, courseInstances, name } = req.body
+      const { name, days } = req.body
       const updatedSchedule = await this.scheduleService.updateSchedule(id, {
-        assignedStudents,
-        courseInstances,
-        name
+        name,
+        days
       })
 
       res.status(200).json(updatedSchedule)
@@ -83,6 +81,39 @@ export class ScheduleController {
       await this.scheduleService.deleteSchedule(scheduleId)
 
       res.status(204).end()
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getCoursesWithoutSchedule = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const courseInstances = await this.scheduleService.getCoursesWithoutSchedule()
+
+      res.status(200).json(courseInstances)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  getScheduleByStudentId = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const schedule = await this.scheduleService.getScheduleByStudentId(id)
+
+      res.status(200).json(schedule)
+    } catch (error) {
+      this.handleError(error, res)
+    }
+  }
+
+  addStudentsToSchedule = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { students } = req.body
+      const schedule = await this.scheduleService.addStudentsToSchedule(id, students)
+
+      res.status(200).json(schedule)
     } catch (error) {
       this.handleError(error, res)
     }

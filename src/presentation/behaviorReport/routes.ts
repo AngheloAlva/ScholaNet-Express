@@ -16,7 +16,7 @@ export class BehaviorReportRoutes {
 
     router.get('/behavior-reports', controller.getBehaviorReports)
     router.get('/behavior-report/:id', idValidation, controller.getBehaviorReportById)
-    router.get('behavior-reports/student/:studentId', [
+    router.get('/behavior-reports/student/:studentId', [
       param('studentId').isMongoId().notEmpty().withMessage('Student id is required'),
       validate
     ], controller.getBehaviorReportsByStudent)
@@ -26,6 +26,7 @@ export class BehaviorReportRoutes {
       body('description').isString().notEmpty().withMessage('Description is required'),
       body('severity').isString().isIn(['mild', 'moderate', 'severe']).notEmpty().withMessage('Severity is required'),
       body('resolved').isBoolean().notEmpty().withMessage('Resolved is required'),
+      body('date').isString().notEmpty().withMessage('Date is required'),
       validate
     ], controller.createBehaviorReport)
 

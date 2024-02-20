@@ -2,6 +2,13 @@ import type { ObjectId } from 'mongoose'
 
 export interface Schedule {
   name: string
-  courseInstances: ObjectId[]
-  assignedStudents: ObjectId[]
+  days: [{
+    day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
+    blocks: [{
+      startTime: string
+      endTime: string
+      courseInstance: ObjectId
+      assignedStudents: ObjectId[]
+    }]
+  }]
 }
