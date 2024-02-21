@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  GUARDIAN
+}
+
+enum Days {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AttendanceStatus {
+  PRESENT
+  EXCUSED
+  ABSENT
+  LATE
+}
+
+enum Severity {
+  MILD
+  MODERATE
+  SEVERE
+}
+
+// Users and Students section
+model User {
+  id                      String      @id @default(uuid())
+  name                    String
+  lastName                String
+  rut                     String      @unique
+  email                   String      @unique
+  password                String
+  role                    Role
+  students                Student[]
+  emailVerified           Boolean     @default(false)
+  emailVerificationCode   String
+  resetPasswordToken      String?
+  resetPasswordExpires    DateTime?
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  refreshToken            String?
+  isAccountActive         Boolean     @default(true)
+  courses                 CourseInstance[]
+}
+
+model Student {
+  id                      String @id @default(uuid())
+  name                    String
+  lastName                String
+  rut                     String @unique
+  dateOfBirth             DateTime
+  password                String
+  refreshToken            String?
+  guardian                User @relation(fields: [guardianId], references: [id])
+  guardianId              String @unique
+  program                 Program @relation(fields: [programId], references: [id])
+  programId               String
+  isAccountActive         Boolean @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  attendances             Attendance[]
+  behaviorReports         BehaviorReport[]
+  grade                  Grade @relation(fields: [gradeId], references: [id])
+  gradeId                String
+}
+
+// Scholanet section
+model Program {
+  id                      String @id @default(uuid())
+  name                    String
+  description             String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  students                Student[]
+  courses                 Course[]
+}
+
+model Course {
+  id                      String @id @default(uuid())
+  name                    String
+  description             String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  program                 Program @relation(fields: [programId], references: [id])
+  programId               String
+  image                   String
+  href                    String
+  grades                  CourseInstance[]
+}
+
+model CourseInstance {
+  id                      String @id @default(uuid())
+  teacher                 User @relation(fields: [teacherId], references: [id])
+  teacherId               String @unique
+  course                  Course @relation(fields: [courseId], references: [id])
+  courseId                String
+  grade                   Grade @relation(fields: [gradeId], references: [id])
+  gradeId                 String
+  behaviorReports         BehaviorReport[]
+  attendances             Attendance[]
+  blocks                  ScheduleBlock[]
+  blocksQuantity          Int
+  generalGrades           CourseInstanceInGeneralGrade[]
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model CourseInstanceInGeneralGrade {
+  id                      String @id @default(uuid())
+  courseInstance          CourseInstance @relation(fields: [courseInstanceId], references: [id])
+  courseInstanceId        String
+  generalGrade            GeneralGrade @relation(fields: [generalGradeId], references: [id])
+  generalGradeId          String
+  blocksQuantity          Int
+}
+
+model GeneralGrade {
+  id                    String @id @default(uuid())
+  name                  String
+  courseInstances       CourseInstanceInGeneralGrade[]
+  grades                Grade[]
+}
+
+model Grade {
+  id                      String @id @default(uuid())
+  name                    String
+  courseInstances         CourseInstance[]
+  generalGrade            GeneralGrade @relation(fields: [generalGradeId], references: [id])
+  generalGradeId          String
+  students                Student[]
+  schedule                Schedule?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Schedule {
+  id                      String @id @default(uuid())
+  name                    String
+  scheduleBlocks          ScheduleBlock[]
+  grade                   Grade @relation(fields: [gradeId], references: [id])
+  gradeId                 String @unique
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model ScheduleBlock {
+  id                      String @id @default(uuid())
+  day                     Days
+  startTime               DateTime
+  endTime                 DateTime
+  schedule                Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId              String @unique
+  courseInstance          CourseInstance @relation(fields: [courseInstanceId], references: [id])
+  courseInstanceId        String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Attendance {
+  id                    String @id @default(uuid())
+  student                 Student @relation(fields: [studentId], references: [id])
+  studentId               String
+  courseInstance          CourseInstance @relation(fields: [courseInstanceId], references: [id])
+  courseInstanceId        String
+  status                  AttendanceStatus
+}
+
+model BehaviorReport {
+  id                      String @id @default(uuid())
+  student                 Student @relation(fields: [studentId], references: [id])
+  studentId               String
+  courseInstance          CourseInstance @relation(fields: [courseInstanceId], references: [id])
+  courseInstanceId        String
+  description             String
+  severity                Severity
+  date                    DateTime @default(now())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
